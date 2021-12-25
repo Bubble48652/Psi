@@ -26,6 +26,7 @@ import net.minecraft.util.text.ITextComponent;
 
 import vazkii.psi.api.ClientPsiAPI;
 import vazkii.psi.api.recipe.ITrickRecipe;
+import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.common.Psi;
 import vazkii.psi.common.item.base.ModItems;
 import vazkii.psi.common.lib.LibMisc;
@@ -60,7 +61,7 @@ public class TrickCraftingCategory implements IRecipeCategory<ITrickRecipe> {
 		this.helper = helper;
 		background = helper.createDrawable(new ResourceLocation(LibMisc.MOD_ID, "textures/gui/jei/trick.png"), 0, 0, 96, 41);
 		icon = helper.createDrawableIngredient(new ItemStack(ModItems.psidust));
-		programmerHover = helper.createDrawable(new ResourceLocation("psi", "textures/gui/programmer.png"), 16, 184, 16, 16);
+		programmerHover = helper.createDrawable(new ResourceLocation("psi", "textures/gui/programmer" + SpellGrid.GRID_SIZE + ".png"), 16, 184, 16, 16);
 	}
 
 	@Nonnull

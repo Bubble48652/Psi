@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.text.StringTextComponent;
 
 import vazkii.psi.api.internal.PsiRenderHelper;
+import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.api.spell.SpellParam;
 import vazkii.psi.api.spell.SpellPiece;
 import vazkii.psi.client.gui.GuiProgrammer;
@@ -81,10 +82,11 @@ public class GuiButtonSideConfig extends Button {
 			}
 
 			float wh = 8F;
-			float minU = side.u / 256F;
-			float minV = side.v / 256F;
-			float maxU = (side.u + wh) / 256F;
-			float maxV = (side.v + wh) / 256F;
+			float s = 94 + SpellGrid.GRID_SIZE * 18;
+			float minU = side.u / s;
+			float minV = side.v / s;
+			float maxU = (side.u + wh) / s;
+			float maxV = (side.v + wh) / s;
 			RenderSystem.enableAlphaTest();
 			BufferBuilder wr = Tessellator.getInstance().getBuffer();
 			wr.begin(7, DefaultVertexFormats.POSITION_TEX);

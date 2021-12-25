@@ -18,6 +18,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import vazkii.psi.api.internal.TooltipHelper;
+import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.client.gui.GuiProgrammer;
 
 public class GuiButtonHelp extends Button {
@@ -34,7 +35,7 @@ public class GuiButtonHelp extends Button {
 		if (!gui.takingScreenshot) {
 			boolean overHelp = mouseX > x && mouseY > y && mouseX < x + 12 && mouseY < y + 12;
 			gui.getMinecraft().getTextureManager().bindTexture(GuiProgrammer.texture);
-			blit(ms, x, y, gui.xSize + (overHelp ? 12 : 0), gui.ySize + 9, 12, 12);
+			blit(ms, x, y, gui.xSize + (overHelp ? 12 : 0), gui.ySize + 9, 12, 12, 94 + SpellGrid.GRID_SIZE * 18, 94 + SpellGrid.GRID_SIZE * 18);
 			if (overHelp && !Screen.hasAltDown()) {
 				gui.tooltip.add(new TranslationTextComponent("psimisc.programmer_help"));
 				String ctrl = I18n.format(Minecraft.IS_RUNNING_ON_MAC ? "psimisc.ctrl_mac" : "psimisc.ctrl_windows");

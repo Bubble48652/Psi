@@ -26,6 +26,7 @@ import org.lwjgl.glfw.GLFW;
 
 import vazkii.psi.api.PsiAPI;
 import vazkii.psi.api.spell.EnumPieceType;
+import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.api.spell.SpellParam;
 import vazkii.psi.api.spell.SpellPiece;
 import vazkii.psi.api.spell.programmer.ProgrammerPopulateEvent;
@@ -73,7 +74,7 @@ public class PiecePanelWidget extends Widget implements IRenderable, IGuiEventLi
 			}
 
 			RenderSystem.color3f(1f, 1f, 1f);
-			blit(ms, searchField.x - 14, searchField.y - 2, 0, parent.ySize + 16, 12, 12);
+			blit(ms, searchField.x - 14, searchField.y - 2, 0, parent.ySize + 16, 12, 12, 94 + SpellGrid.GRID_SIZE * 18, 94 + SpellGrid.GRID_SIZE * 18);
 
 			String s = Math.min(Math.max(getPageCount(), 1), page + 1) + "/" + Math.max(getPageCount(), 1);
 			parent.getMinecraft().fontRenderer.drawStringWithShadow(ms, s, x + width / 2f - parent.getMinecraft().fontRenderer.getStringWidth(s) / 2f, y + height - 12, 0xFFFFFF);

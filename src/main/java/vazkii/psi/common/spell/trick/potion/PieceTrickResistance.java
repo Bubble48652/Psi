@@ -13,6 +13,7 @@ import net.minecraft.potion.Effects;
 
 import vazkii.psi.api.spell.Spell;
 import vazkii.psi.api.spell.SpellCompilationException;
+import vazkii.psi.common.core.handler.ConfigHandler;
 
 public class PieceTrickResistance extends PieceTrickPotionBase {
 
@@ -27,7 +28,7 @@ public class PieceTrickResistance extends PieceTrickPotionBase {
 
 	@Override
 	public int getPotency(int power, int time) throws SpellCompilationException {
-		return (int) multiplySafe(power, power, power, time, 5);
+		return (int) multiplySafe(power, power, power, time, 5, ConfigHandler.COMMON.PieceTrickResistanceCostMultiple.get());
 	}
 
 }

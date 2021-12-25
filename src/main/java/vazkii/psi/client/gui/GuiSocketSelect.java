@@ -33,6 +33,7 @@ import vazkii.psi.api.PsiAPI;
 import vazkii.psi.api.cad.ISocketable;
 import vazkii.psi.api.cad.ISocketableController;
 import vazkii.psi.api.internal.PsiRenderHelper;
+import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.client.core.handler.KeybindHandler;
 import vazkii.psi.common.Psi;
 import vazkii.psi.common.core.handler.PlayerDataHandler;
@@ -224,7 +225,7 @@ public class GuiSocketSelect extends Screen {
 				ydp = (int) ((yp - y) * mod + y);
 
 				mc.textureManager.bindTexture(signs.get(seg));
-				blit(ms, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
+				blit(ms, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16, 94 + SpellGrid.GRID_SIZE * 18, 94 + SpellGrid.GRID_SIZE * 18);
 			}
 		}
 

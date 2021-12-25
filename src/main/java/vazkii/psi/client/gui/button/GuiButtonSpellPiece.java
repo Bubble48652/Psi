@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.text.StringTextComponent;
 
+import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.api.spell.SpellPiece;
 import vazkii.psi.client.gui.GuiProgrammer;
 
@@ -49,7 +50,7 @@ public class GuiButtonSpellPiece extends Button {
 			Minecraft.getInstance().getTextureManager().bindTexture(GuiProgrammer.texture);
 			if (hover) {
 				piece.getTooltip(gui.tooltip);
-				blit(ms, x, y, 16, gui.ySize, 16, 16);
+				blit(ms, x, y, 16, gui.ySize, 16, 16, 94 + SpellGrid.GRID_SIZE * 18, 94 + SpellGrid.GRID_SIZE * 18);
 			}
 
 		}

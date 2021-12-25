@@ -23,6 +23,7 @@ import vazkii.psi.api.spell.SpellRuntimeException;
 import vazkii.psi.api.spell.param.ParamNumber;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.core.handler.ConfigHandler;
 
 public class PieceTrickExplode extends PieceTrick {
 
@@ -51,7 +52,7 @@ public class PieceTrickExplode extends PieceTrick {
 		powerVal = Math.max(0.5, powerVal);
 
 		meta.addStat(EnumSpellStat.POTENCY, (int) (powerVal * 70));
-		meta.addStat(EnumSpellStat.COST, (int) (powerVal * 210));
+		meta.addStat(EnumSpellStat.COST, (int) (powerVal * 210 * ConfigHandler.COMMON.PieceTrickExplodeCostMultiple.get()));
 	}
 
 	@Override

@@ -9,6 +9,7 @@
 package vazkii.psi.common.lib;
 
 import net.minecraft.util.ResourceLocation;
+import vazkii.psi.api.spell.SpellGrid;
 
 public class LibResources {
 
@@ -30,7 +31,7 @@ public class LibResources {
 	public static final String GUI_PSI_BAR_MASK = PREFIX_GUI + "psi_bar_mask.png";
 	public static final String GUI_PSI_BAR_SHATTER = PREFIX_GUI + "psi_bar_shatter.png";
 	public static final String GUI_SIGN = PREFIX_GUI + "signs/sign%d.png";
-	public static final String GUI_PROGRAMMER = PREFIX_GUI + "programmer.png";
+	public static final String GUI_PROGRAMMER = PREFIX_GUI + "programmer" + SpellGrid.GRID_SIZE + ".png";
 
 	public static final String SPELL_CONNECTOR_LINES = PREFIX_MOD + "spell/connector_lines";
 

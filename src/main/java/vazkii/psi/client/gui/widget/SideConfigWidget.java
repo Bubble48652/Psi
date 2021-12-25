@@ -50,7 +50,7 @@ public class SideConfigWidget extends Widget {
 			piece = parent.spell.grid.gridData[GuiProgrammer.selectedX][GuiProgrammer.selectedY];
 		}
 		if (configEnabled && !parent.takingScreenshot) {
-			blit(ms, parent.left - 81, parent.top + 55, parent.xSize, 30, 81, 115);
+			blit(ms, parent.left - 81, parent.top + 55, parent.xSize, 30, 81, 115, 94 + SpellGrid.GRID_SIZE * 18, 94 + SpellGrid.GRID_SIZE * 18);
 			String configStr = I18n.format("psimisc.config");
 			parent.getMinecraft().fontRenderer.drawString(ms, configStr, parent.left - parent.getMinecraft().fontRenderer.getStringWidth(configStr) - 2, parent.top + 45, 0xFFFFFF);
 
@@ -69,7 +69,7 @@ public class SideConfigWidget extends Widget {
 
 					RenderSystem.color3f(1F, 1F, 1F);
 					parent.getMinecraft().getTextureManager().bindTexture(GuiProgrammer.texture);
-					blit(ms, x + 50, y - 8, parent.xSize, 145, 24, 24);
+					blit(ms, x + 50, y - 8, parent.xSize, SpellGrid.GRID_SIZE * 18 - 17, 24, 24, 94 + SpellGrid.GRID_SIZE * 18, 94 + SpellGrid.GRID_SIZE * 18);
 
 					String localized = I18n.format(s);
 					if (i == param) {

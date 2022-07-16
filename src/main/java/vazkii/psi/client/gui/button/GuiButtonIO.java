@@ -18,6 +18,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
+import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.client.gui.GuiProgrammer;
 
 public class GuiButtonIO extends Button {
@@ -44,7 +45,7 @@ public class GuiButtonIO extends Button {
 
 			Minecraft.getInstance().textureManager.bindTexture(GuiProgrammer.texture);
 			RenderSystem.color4f(1F, 1F, 1F, 1F);
-			blit(ms, x, y, hover ? 186 : 174, out ? 169 : 181, width, height);
+			blit(ms, x, y, hover ? 24 + SpellGrid.GRID_SIZE * 18 : 12 + SpellGrid.GRID_SIZE * 18, out ? 7 + SpellGrid.GRID_SIZE * 18 : 19 + SpellGrid.GRID_SIZE * 18, width, height, 94 + SpellGrid.GRID_SIZE * 18, 94 + SpellGrid.GRID_SIZE * 18);
 
 			if (hover) {
 				String key = out ? "psimisc.export_to_clipboard" : "psimisc.import_from_clipboard";

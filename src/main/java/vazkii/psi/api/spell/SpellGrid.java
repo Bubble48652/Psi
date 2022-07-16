@@ -17,6 +17,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import vazkii.psi.common.core.handler.ConfigHandler;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public final class SpellGrid {
 	private static final String TAG_SPELL_POS_Y = "y";
 	private static final String TAG_SPELL_DATA = "data";
 
-	public static final int GRID_SIZE = 9;
+	public static final int GRID_SIZE = ConfigHandler.COMMON.GirdSize.get();
 	public static final int GRID_CENTER = (GRID_SIZE - 1) / 2;
 
 	public final Spell spell;

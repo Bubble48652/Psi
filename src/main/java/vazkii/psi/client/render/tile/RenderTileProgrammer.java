@@ -22,6 +22,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;
 
+import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.client.core.handler.ClientTickHandler;
 import vazkii.psi.client.gui.GuiProgrammer;
 import vazkii.psi.common.Psi;
@@ -73,19 +74,20 @@ public class RenderTileProgrammer extends TileEntityRenderer<TileProgrammer> {
 				ms.translate(70F, -220F, -100F + Math.sin(ClientTickHandler.total / 50) * 10);
 				ms.rotate(Vector3f.XP.rotationDegrees(-16F + (float) Math.cos(ClientTickHandler.total / 100) * 10F));
 			} else {
-				ms.translate(70F, 0F, -200F);
+				ms.translate(151 - SpellGrid.GRID_SIZE * 9, 162 - SpellGrid.GRID_SIZE * 18, -200F);
 			}
 
 			te.spell.draw(ms, buffers, light);
 
 			ms.push();
-			ms.translate(0F, 0F, -0.01F);
+			ms.translate((SpellGrid.GRID_SIZE - 9) * 9, (SpellGrid.GRID_SIZE - 9) * 18, -0.01F);
 			IVertexBuilder buffer = buffers.getBuffer(GuiProgrammer.LAYER);
-			float x = -7, y = -7;
-			float width = 174;
-			float height = 184;
+			float size = 94 + SpellGrid.GRID_SIZE * 18;
+			float x = 74 - SpellGrid.GRID_SIZE * 9, y = 155 - SpellGrid.GRID_SIZE * 18;
+			float width = 12 + SpellGrid.GRID_SIZE * 18;
+			float height = 22 + SpellGrid.GRID_SIZE * 18;
 			float u = 0, v = 0;
-			float rescale = 1 / 256F;
+			float rescale = 1 / size;
 			float a = Psi.magical ? 1F : 0.5F;
 			Matrix4f mat = ms.getLast().getMatrix();
 			buffer.pos(mat, x, y + height, 0).color(1, 1, 1, a).tex(u * rescale, (v + height) * rescale).lightmap(light).endVertex();
@@ -96,8 +98,8 @@ public class RenderTileProgrammer extends TileEntityRenderer<TileProgrammer> {
 
 			int color = Psi.magical ? 0 : 0xFFFFFF;
 			Minecraft mc = Minecraft.getInstance();
-			mc.fontRenderer.renderString(I18n.format("psimisc.name"), 0, 164, color, false, ms.getLast().getMatrix(), buffers, false, 0, 0xF000F0);
-			mc.fontRenderer.renderString(te.spell.name, 38, 164, color, false, ms.getLast().getMatrix(), buffers, false, 0, 0xF000F0);
+			mc.fontRenderer.renderString(I18n.format("psimisc.name"), 20, SpellGrid.GRID_SIZE * 18, color, false, ms.getLast().getMatrix(), buffers, false, 0, 0xF000F0);
+			mc.fontRenderer.renderString(te.spell.name, 58, SpellGrid.GRID_SIZE * 18, color, false, ms.getLast().getMatrix(), buffers, false, 0, 0xF000F0);
 
 			ms.pop();
 		}

@@ -145,11 +145,11 @@ public abstract class SpellParam<T> {
 	 * Helper Enum for the various sides a parameter can take.
 	 */
 	public enum Side {
-		OFF(0, 0, 0, 0, 0, 0, 238, 0),
-		TOP(0, -1, 4, -9, -4, -9, 222, 8),
-		BOTTOM(0, 1, 4, 9, -4, 9, 230, 8),
-		LEFT(-1, 0, -9, 4, -9, -4, 230, 0),
-		RIGHT(1, 0, 9, 4, 9, -4, 222, 0);
+		OFF(0, 0, 0, 0, 0, 0, 76 + SpellGrid.GRID_SIZE * 18, 0),
+		TOP(0, -1, 4, -9, -4, -9, 60 + SpellGrid.GRID_SIZE * 18, 8),
+		BOTTOM(0, 1, 4, 9, -4, 9, 68 + SpellGrid.GRID_SIZE * 18, 8),
+		LEFT(-1, 0, -9, 4, -9, -4, 68 + SpellGrid.GRID_SIZE * 18, 0),
+		RIGHT(1, 0, 9, 4, 9, -4, 60 + SpellGrid.GRID_SIZE * 18, 0);
 
 		public static final Side[] DIRECTIONS = new Side[] { TOP, BOTTOM, LEFT, RIGHT };
 

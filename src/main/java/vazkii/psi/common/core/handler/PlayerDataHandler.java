@@ -130,6 +130,8 @@ public class PlayerDataHandler {
 	@Mod.EventBusSubscriber(modid = LibMisc.MOD_ID)
 	public static class EventHandler {
 
+		private static int tickCount;
+
 		@SubscribeEvent
 		public static void onServerTick(TickEvent.ServerTickEvent event) {
 			if (event.phase == TickEvent.Phase.END) {
@@ -204,9 +206,20 @@ public class PlayerDataHandler {
 
 			for (int i = 0; i < 4; i++) {
 				ItemStack armor = ((PlayerEntity) event.getEntityLiving()).inventory.armorInventory.get(i);
-				if (!armor.isEmpty() && armor.getItem() instanceof IPsiEventArmor) {
-					IPsiEventArmor handler = (IPsiEventArmor) armor.getItem();
-					handler.onEvent(armor, event);
+				String name = armor.toString();
+				if ("1 psimetal_exosuit_leggings".equals(name) && event.type.equals(PsiArmorEvent.TICK)) {
+					if (tickCount >= ConfigHandler.COMMON.LeggingsTicks.get()) {
+						tickCount = 1;
+						IPsiEventArmor handler = (IPsiEventArmor) armor.getItem();
+						handler.onEvent(armor, event);
+					} else {
+						tickCount++;
+					}
+				} else {
+					if (!armor.isEmpty() && armor.getItem() instanceof IPsiEventArmor) {
+						IPsiEventArmor handler = (IPsiEventArmor) armor.getItem();
+						handler.onEvent(armor, event);
+					}
 				}
 			}
 		}
@@ -262,8 +275,8 @@ public class PlayerDataHandler {
 
 		private static final String TAG_CUSTOM_DATA = "customData";
 
-		public int totalPsi = 5000;
-		public int regen = 25;
+		public int totalPsi = ConfigHandler.COMMON.maxPsiEnergy.get();
+		public int regen = ConfigHandler.COMMON.regenRate.get();
 
 		public int availablePsi;
 		public int lastAvailablePsi;
@@ -623,14 +636,14 @@ public class PlayerDataHandler {
 		}
 
 		public int calculateDamageDeduction(float amount) {
-			return (int) (getTotalPsi() * 0.02 * amount);
+			return (int) (getTotalPsi() * ConfigHandler.COMMON.reducePsiPercentWhenDamaged.get() * amount);
 		}
 
 		public void damage(float amount) {
 			int psi = calculateDamageDeduction(amount);
 			if (psi > 0 && availablePsi > 0) {
 				psi = Math.min(psi, availablePsi);
-				deductPsi(psi, 20, true, true);
+				deductPsi(psi, ConfigHandler.COMMON.deductPsiTicks.get(), true, true);
 			}
 		}
 

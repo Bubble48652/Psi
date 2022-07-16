@@ -16,6 +16,7 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
+import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.client.gui.GuiProgrammer;
 
 public class GuiButtonPage extends Button {
@@ -42,7 +43,7 @@ public class GuiButtonPage extends Button {
 
 			Minecraft.getInstance().textureManager.bindTexture(GuiProgrammer.texture);
 			RenderSystem.color4f(1F, 1F, 1F, 1F);
-			blit(ms, x, y, hover ? 216 : 198, right ? 145 : 155, width, height);
+			blit(ms, x, y, hover ? 54 + SpellGrid.GRID_SIZE * 18 : 36 + SpellGrid.GRID_SIZE * 18, right ? SpellGrid.GRID_SIZE * 18 - 17 : SpellGrid.GRID_SIZE * 18 - 7, width, height, 94 + SpellGrid.GRID_SIZE * 18, 94 + SpellGrid.GRID_SIZE * 18);
 
 			if (hover) {
 				gui.tooltip.add(new TranslationTextComponent(right ? "psimisc.next_page" : "psimisc.prev_page"));

@@ -415,10 +415,11 @@ public abstract class SpellPiece {
 			side = side.getOpposite();
 		}
 		float wh = 8F;
-		float minU = side.u / 256F;
-		float minV = side.v / 256F;
-		float maxU = (side.u + wh) / 256F;
-		float maxV = (side.v + wh) / 256F;
+		float s = 94 + SpellGrid.GRID_SIZE * 18;
+		float minU = side.u / s;
+		float minV = side.v / s;
+		float maxU = (side.u + wh) / s;
+		float maxV = (side.v + wh) / s;
 
 		int r = PsiRenderHelper.r(color);
 		int g = PsiRenderHelper.g(color);

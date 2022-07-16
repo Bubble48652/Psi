@@ -33,6 +33,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import vazkii.psi.api.PsiAPI;
 import vazkii.psi.api.cad.ISocketable;
 import vazkii.psi.api.spell.SpellContext;
+import vazkii.psi.common.core.handler.ConfigHandler;
 import vazkii.psi.common.core.handler.PlayerDataHandler;
 import vazkii.psi.common.core.handler.PlayerDataHandler.PlayerData;
 import vazkii.psi.common.item.ItemCAD;
@@ -45,7 +46,7 @@ import java.util.List;
 public class ItemPsimetalSword extends SwordItem implements IPsimetalTool {
 
 	public ItemPsimetalSword(Item.Properties properties) {
-		super(PsiAPI.PSIMETAL_TOOL_MATERIAL, 3, -2.4F, properties);
+		super(PsiAPI.PSIMETAL_TOOL_MATERIAL, ConfigHandler.COMMON.SwordAttackDamage.get(), -ConfigHandler.COMMON.SwordAttackSpeed.get().floatValue(), properties);
 	}
 
 	@Override

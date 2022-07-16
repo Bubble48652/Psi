@@ -15,6 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 
 import vazkii.psi.api.PsiAPI;
+import vazkii.psi.common.core.handler.ConfigHandler;
 
 public class PsimetalToolMaterial implements IItemTier {
 	private static final LazyValue<Ingredient> REPAIR_MATERIAL = new LazyValue<>(
@@ -37,7 +38,7 @@ public class PsimetalToolMaterial implements IItemTier {
 
 	@Override
 	public int getHarvestLevel() {
-		return 3;
+		return ConfigHandler.COMMON.HarvestLevel.get();
 	}
 
 	@Override

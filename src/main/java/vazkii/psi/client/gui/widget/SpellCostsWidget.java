@@ -21,6 +21,7 @@ import vazkii.psi.api.PsiAPI;
 import vazkii.psi.api.cad.EnumCADStat;
 import vazkii.psi.api.cad.ICAD;
 import vazkii.psi.api.spell.EnumSpellStat;
+import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.api.spell.SpellMetadata;
 import vazkii.psi.client.gui.GuiProgrammer;
 import vazkii.psi.common.Psi;
@@ -69,7 +70,7 @@ public class SpellCostsWidget extends Widget {
 
 				RenderSystem.color3f(1f, 1f, 1f);
 				parent.getMinecraft().getTextureManager().bindTexture(GuiProgrammer.texture);
-				blit(ms, statX, statY, (stat.ordinal() + 1) * 12, parent.ySize + 16, 12, 12);
+				blit(ms, statX, statY, (stat.ordinal() + 1) * 12, parent.ySize + 16, 12, 12, 94 + SpellGrid.GRID_SIZE * 18, 94 + SpellGrid.GRID_SIZE * 18);
 				parent.getMinecraft().fontRenderer.drawString(ms, s, statX + 16, statY + 2, cadStat != null && cadVal < val && cadVal != -1 ? 0xFF6666 : 0xFFFFFF);
 
 				if (mouseX > statX && mouseY > statY && mouseX < statX + 12 && mouseY < statY + 12 && !parent.panelWidget.panelEnabled) {

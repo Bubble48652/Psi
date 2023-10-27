@@ -8,7 +8,7 @@
  */
 package vazkii.psi.common.spell.selector.entity;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import vazkii.psi.api.PsiAPI;
 import vazkii.psi.api.cad.EnumCADStat;
@@ -27,8 +27,8 @@ public class PieceSelectorCasterBattery extends PieceSelector {
 	@Override
 	public Object execute(SpellContext context) throws SpellRuntimeException {
 		ItemStack cad = PsiAPI.getPlayerCAD(context.caster);
-		if (cad != null) {
-			return ((ICAD) cad.getItem()).getStatValue(cad, EnumCADStat.OVERFLOW) * 1.0;
+		if (cad != null && cad.getItem() instanceof ICAD icad) {
+			return icad.getStatValue(cad, EnumCADStat.OVERFLOW) * 1.0;
 		}
 		return 0.0;
 	}

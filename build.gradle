@@ -1,56 +1,52 @@
 buildscript {
     repositories {
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://repo.spongepowered.org/maven' }
         mavenCentral()
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        maven { url = 'https://repo.spongepowered.org/repository/maven-public' }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1+', changing: true
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
 
 plugins {
-    id "com.diffplug.spotless" version "5.7.0"
+    id 'com.diffplug.gradle.spotless' version '4.5.1'
 }
 
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'maven'
-apply plugin: 'pmd'
 apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+apply plugin: 'pmd'
 
 ext.configFile = file('build.properties')
 ext.config = parseConfig(configFile)
 
-def mc_version = "1.16.3"
 version = "${config.version}-${config.build_number}"
 group = "vazkii.${config.mod_id}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = config.mod_name
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+compileJava.options.compilerArgs << "-Xlint:all,-classfile,-processing,-deprecation"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 if (System.getenv('BUILD_NUMBER') != null) {
     version += "." + System.getenv('BUILD_NUMBER')
 }
 
-mixin {
-  add sourceSets.main, "psi.refmap.json"
-}
-
 minecraft {
-    mappings channel: "snapshot", version: "20200916-1.16.2"
+    mappings channel: "${config.mapping_channel}", version: "${config.mapping_version}"
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
+    // Default run configurations.
+    // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
             workingDirectory project.file('run')
-
-            properties 'fml.earlyprogresswindow': 'false'
-            property 'forge.logging.console.level', 'debug'
-            property 'mixin.env.disableRefMap', 'true'
-            arg "-mixin.config=" + config.mod_id + ".mixins.json"
-
             mods {
                 psi {
                     source sourceSets.main
@@ -60,22 +56,16 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
-
-            property 'forge.logging.console.level', 'debug'
-            property 'mixin.env.disableRefMap', 'true'
-            arg "-mixin.config=" + config.mod_id + ".mixins.json"
-            singleInstance(true)
             mods {
                 psi {
                     source sourceSets.main
                 }
             }
         }
+
         data {
             properties 'forge.logging.console.level': 'debug'
             properties 'fml.earlyprogresswindow': 'false'
-            property 'mixin.env.disableRefMap', 'true'
-            arg "-mixin.config=" + config.mod_id + ".mixins.json"
             workingDirectory project.file('run')
             mods {
                 psi {
@@ -89,34 +79,44 @@ minecraft {
     }
 }
 
+mixin {
+    add sourceSets.main, 'psi.refmap.json'
+    config 'psi.mixins.json'
+}
+
 repositories {
     mavenCentral()
     maven {
         // for Patchouli
         name "blamejared"
-        url "http://maven.blamejared.com/"
+        url "https://maven.blamejared.com/"
+        content {
+            includeGroup "vazkii.patchouli"
+        }
     }
     maven {
         // for JEI
-        name "promwml16"
-        url "http://dvs1.progwml6.com/files/maven"
+        name "progwml6"
+        url "https://dvs1.progwml6.com/files/maven"
+        content {
+            includeGroup "mezz.jei"
+        }
     }
 }
 
+
 dependencies {
-    minecraft group: 'net.minecraftforge', name: 'forge', version: "${mc_version}-34.1.0"
+    minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 
-    annotationProcessor 'org.spongepowered:mixin:0.8.1:processor'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.2-47-SNAPSHOT:api")
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.2-47-SNAPSHOT")
+    compileOnly fg.deobf("vazkii.patchouli:Patchouli:${config.patchy_version}:api")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${config.patchy_version}")
 
-    compileOnly fg.deobf("mezz.jei:jei-1.16.2:7.3.2.25:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.2:7.3.2.25")
-
+    compileOnly fg.deobf("mezz.jei:${config.jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:${config.jei_version}")
 }
 
-// Prevent Mixin annotation processor from getting into IDEA's annotation processor settings
 if (System.getProperty("idea.sync.active") == "true") {
     afterEvaluate {
         tasks.withType(JavaCompile).all {
@@ -127,66 +127,35 @@ if (System.getProperty("idea.sync.active") == "true") {
 
 spotless {
     enforceCheck = false // workaround around jenkins having wrong line endings in some files
-    // we explicitly check in github actions builds
     java {
-        targetExclude '**/Gamma.java'
-
-        indentWithTabs()
-        licenseHeaderFile( 'spotless/license_template.txt')
+        target project.fileTree(dir: 'src/main/java/vazkii/psi', include: '**/*.java')
+        //indentWithTabs()
         eclipse().configFile 'spotless/eclipseformat.xml'
         removeUnusedImports()
         importOrderFile 'spotless/eclipse.importorder'
+        replaceRegex 'Too much space after if', '(if|for|while|switch) +\\(', '$1('
     }
 }
 
 pmd {
-    toolVersion '6.22.0'
+    toolVersion '6.42.0'
     incrementalAnalysis.set(true)
     ruleSets.clear()
     ruleSetFiles = files("spotless/pmd-ruleset.xml")
 }
 
-
-task checkSyntax {
-    dependsOn spotlessJavaCheck, pmdMain
+task checkSyntax (group: "verification") {
+    // Replace the following line when Spotless is setup
+    //dependsOn spotlessJavaCheck, pmdMain
+    dependsOn pmdMain
 }
-
-sourceSets.main.resources {
-    srcDir 'src/generated/resources'
-}
-
 
 processResources {
-    // replace stuff in mods.toml, nothing else
+    // copy everything excluding psd files
     from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-
-        // replace version and mcversion
-        expand 'version': project.version
+        exclude '**/psd/**'
+        duplicatesStrategy 'include'
     }
-
-    // copy everything else, thats not the mods.toml
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'META-INF/mods.toml', '**/psd/**'
-    }
-}
-
-task srcJar(type: Jar) {
-    from(sourceSets.main.java)
-    classifier = 'sources'
-}
-
-task apiJar(type: Jar) {
-    // Remove sources from the api jar when MinecraftForge/ForgeGradle#369 is fixed
-    from(sourceSets.main.allJava)
-    from(sourceSets.main.output)
-    include 'vazkii/psi/api/**'
-
-    classifier = 'api'
-}
-
-artifacts {
-    archives srcJar, apiJar
 }
 
 task incrementBuildNumber {
@@ -194,6 +163,28 @@ task incrementBuildNumber {
         config.build_number = (config.build_number.toString().toInteger()) + 1
         configFile.withWriter {
             config.toProperties().store(it, "")
+        }
+    }
+
+    //file('web/versions.ini').append("\n${version}=${minecraft.version}")
+    //file("${config.dir_repo}/version/${minecraft.version}.txt").write("${version}")
+}
+
+import java.util.regex.Pattern
+task sortArtifacts(type: Copy) {
+    from jar.destinationDir
+    into config.dir_output
+    //Put each jar with a classifier in a subfolder with the classifier as its name
+    eachFile {
+        //This matcher is used to get the classifier of the jar
+        def matcher = Pattern.compile(Pattern.quote("$config.mod_name-$version") + "-(?<classifier>\\w+).jar").matcher(it.name)
+        //Only change the destination for full matches, i.e jars with classifiers
+        if (matcher.matches())
+        {
+            def classifier = matcher.group('classifier')
+            /* Set the relative path to change the destination, since
+             * Gradle doesn't seem to like the absolute path being set*/
+            it.relativePath = it.relativePath.parent.append(false, classifier, it.name)
         }
     }
 }
@@ -208,18 +199,18 @@ def parseConfig(File config) {
 
 jar {
     //rename the default output, for some better... sanity with scipts
-    archiveName = "${baseName} ${version}.${extension}"
+    archiveName = "${baseName}-${version}.${extension}"
 
-    manifest {
+     manifest {
         attributes([
-                "Specification-Title": "${config.mod_id}",
-                "Specification-Vendor": "vazkii",
-                "Specification-Version": "1", // We are version 1 of ourselves
-                "Implementation-Title": "${config.mod_id}",
-                "Implementation-Version": "${version}",
-                "Implementation-Vendor" :"vazkii",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "MixinConfigs": "${config.mod_id}.mixins.json"
+            "Specification-Title": "${config.mod_id}",
+            "Specification-Vendor": "vazkii",
+            "Specification-Version": "1", // We are version 1 of ourselves
+            "Implementation-Title": "${config.mod_id}",
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"vazkii",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            "MixinConfigs": "psi.mixins.json"
         ])
     }
 
@@ -227,26 +218,66 @@ jar {
     exclude "**/*.psd"
     exclude "**/*.exe"
     exclude "**/unused"
-    exclude "**/*.py"
-    exclude "**/*.sh"
-    exclude "**/*.txt"
-    exclude "**/*.sh"
-    exclude "**/*.vim"
-    exclude "**/mappings-en_us.json"
-    exclude "**/en_us_base.json"
+    exclude "**/genscripts"
 }
 
+task sourcesJar(type: Jar) {
+    classifier = "sources"
+    from sourceSets.main.allJava
+}
 
-uploadArchives {
+task deobfJar(type: Jar) {
+    classifier = "deobf"
+    from sourceSets.main.output
+}
+
+artifacts {
+    archives sourcesJar
+    archives deobfJar
+}
+
+publish.dependsOn(project.tasks.getByName("assemble"))
+publish.mustRunAfter(project.tasks.getByName("build"))
+
+publishing {
+
+    publications {
+
+        mavenJava(MavenPublication) {
+
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+            from components.java
+
+            // Allows the maven pom file to be modified.
+            pom.withXml {
+
+                // Go through all the dependencies.
+                asNode().dependencies.dependency.each { dep ->
+
+                    println 'Surpressing artifact ' + dep.artifactId.last().value().last() + ' from maven dependencies.'
+                    assert dep.parent().remove(dep)
+                }
+            }
+
+            artifact sourcesJar {
+                classifier 'sources'
+            }
+        }
+    }
+
     repositories {
-        mavenDeployer {
-            repository(url: "file://" + (System.getenv("local_maven") != null ? System.getenv("local_maven") : System.getenv("bamboo_local_maven")))
+        maven {
+            url "file://" + System.getenv("local_maven")
         }
     }
 }
 
-mixin {
-    add sourceSets.main, "${config.mod_id}.refmap.json"
-}
+// Disables Gradle's custom module metadata from being published to maven. The
+// metadata includes mapped dependencies which are not reasonably consumable by
+// other mod developers.
+tasks.withType(GenerateModuleMetadata) {
 
-defaultTasks 'clean', 'runData', 'checkSyntax', 'build', 'incrementBuildNumber'
+    enabled = false
+}

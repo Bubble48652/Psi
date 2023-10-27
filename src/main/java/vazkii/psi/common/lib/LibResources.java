@@ -8,7 +8,7 @@
  */
 package vazkii.psi.common.lib;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import vazkii.psi.api.spell.SpellGrid;
 
 public class LibResources {

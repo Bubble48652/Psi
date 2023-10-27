@@ -8,11 +8,11 @@
  */
 package vazkii.psi.common.network.message;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import vazkii.psi.api.internal.VanillaPacketDispatcher;
 import vazkii.psi.api.spell.Spell;
@@ -30,33 +30,33 @@ public class MessageSpellModified {
 		this.spell = spell;
 	}
 
-	public MessageSpellModified(FriendlyByteBuf buf) {
+	public MessageSpellModified(PacketBuffer buf) {
 		this.pos = buf.readBlockPos();
 		this.spell = readSpell(buf);
 	}
 
-	private static Spell readSpell(FriendlyByteBuf buf) {
-		CompoundTag cmp = buf.readNbt();
+	private static Spell readSpell(PacketBuffer buf) {
+		CompoundNBT cmp = buf.readCompoundTag();
 		return Spell.createFromNBT(cmp);
 	}
 
-	private static void writeSpell(FriendlyByteBuf buf, Spell spell) {
-		CompoundTag cmp = new CompoundTag();
+	private static void writeSpell(PacketBuffer buf, Spell spell) {
+		CompoundNBT cmp = new CompoundNBT();
 		if (spell != null) {
 			spell.writeToNBT(cmp);
 		}
 
-		buf.writeNbt(cmp);
+		buf.writeCompoundTag(cmp);
 	}
 
-	public void encode(FriendlyByteBuf buf) {
+	public void encode(PacketBuffer buf) {
 		buf.writeBlockPos(pos);
 		writeSpell(buf, spell);
 	}
 
 	public void receive(Supplier<NetworkEvent.Context> context) {
 		context.get().enqueueWork(() -> {
-			BlockEntity te = context.get().getSender().level.getBlockEntity(pos);
+			TileEntity te = context.get().getSender().world.getTileEntity(pos);
 			if (te instanceof TileProgrammer) {
 				TileProgrammer tile = (TileProgrammer) te;
 				if (tile.playerLock == null || tile.playerLock.isEmpty() || tile.playerLock.equals(context.get().getSender().getName().getString())) {

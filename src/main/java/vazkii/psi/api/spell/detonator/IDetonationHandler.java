@@ -8,10 +8,10 @@
  */
 package vazkii.psi.api.spell.detonator;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
 import vazkii.psi.api.PsiAPI;
@@ -33,44 +33,44 @@ public interface IDetonationHandler {
 		return entity.getCapability(PsiAPI.DETONATION_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
 	}
 
-	static void performDetonation(Level world, Player player) {
+	static void performDetonation(World world, PlayerEntity player) {
 		performDetonation(world, player, player, MAX_DISTANCE, (e) -> true);
 	}
 
-	static void performDetonation(Level world, Player player, double range) {
+	static void performDetonation(World world, PlayerEntity player, double range) {
 		performDetonation(world, player, player, range, (e) -> true);
 	}
 
-	static void performDetonation(Level world, Player player, Predicate<Entity> filter) {
+	static void performDetonation(World world, PlayerEntity player, Predicate<Entity> filter) {
 		performDetonation(world, player, player, MAX_DISTANCE, filter);
 	}
 
-	static void performDetonation(Level world, Player player, double range, Predicate<Entity> filter) {
+	static void performDetonation(World world, PlayerEntity player, double range, Predicate<Entity> filter) {
 		performDetonation(world, player, player, range, filter);
 	}
 
-	static void performDetonation(Level world, Player player, Entity center) {
+	static void performDetonation(World world, PlayerEntity player, Entity center) {
 		performDetonation(world, player, center, MAX_DISTANCE, (e) -> true);
 	}
 
-	static void performDetonation(Level world, Player player, Entity center, double range) {
+	static void performDetonation(World world, PlayerEntity player, Entity center, double range) {
 		performDetonation(world, player, center, range, (e) -> true);
 	}
 
-	static void performDetonation(Level world, Player player, Entity center, Predicate<Entity> filter) {
+	static void performDetonation(World world, PlayerEntity player, Entity center, Predicate<Entity> filter) {
 		performDetonation(world, player, center, MAX_DISTANCE, filter);
 	}
 
-	static void performDetonation(Level world, Player player, Entity center, double range, Predicate<Entity> filter) {
-		List<Entity> charges = world.getEntitiesOfClass(Entity.class,
-				center.getBoundingBox().inflate(range),
+	static void performDetonation(World world, PlayerEntity player, Entity center, double range, Predicate<Entity> filter) {
+		List<Entity> charges = world.getEntitiesWithinAABB(Entity.class,
+				center.getBoundingBox().grow(range),
 				entity -> {
 					if (entity == null) {
 						return false;
 					}
 					return entity.getCapability(PsiAPI.DETONATION_HANDLER_CAPABILITY).map(detonator -> {
-						Vec3 locus = detonator.objectLocus();
-						if (locus == null || locus.distanceToSqr(center.getX(), center.getY(), center.getZ()) > range * range) {
+						Vector3d locus = detonator.objectLocus();
+						if (locus == null || locus.squareDistanceTo(center.getPosX(), center.getPosY(), center.getPosZ()) > range * range) {
 							return false;
 						}
 						return filter == null || filter.test(entity);
@@ -95,7 +95,7 @@ public interface IDetonationHandler {
 	 *
 	 * Null implies this detonator does not exist in the world.
 	 */
-	default Vec3 objectLocus() {
+	default Vector3d objectLocus() {
 		return null;
 	}
 

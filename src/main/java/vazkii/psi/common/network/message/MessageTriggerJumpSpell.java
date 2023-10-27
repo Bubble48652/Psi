@@ -8,7 +8,7 @@
  */
 package vazkii.psi.common.network.message;
 
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import vazkii.psi.api.exosuit.PsiArmorEvent;
 

@@ -8,10 +8,10 @@
  */
 package vazkii.psi.api.cad;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import vazkii.psi.api.PsiAPI;
 import vazkii.psi.api.spell.ISpellAcceptor;
@@ -44,18 +44,18 @@ public interface ISocketable {
 
 	int MAX_ASSEMBLER_SLOTS = 12;
 
-	static Component getSocketedItemName(ItemStack stack, String fallbackKey) {
+	static ITextComponent getSocketedItemName(ItemStack stack, String fallbackKey) {
 		if (stack.isEmpty() || !isSocketable(stack)) {
-			return new TranslatableComponent(fallbackKey);
+			return new TranslationTextComponent(fallbackKey);
 		}
 
 		ISocketable socketable = socketable(stack);
 		ItemStack item = socketable.getSelectedBullet();
 		if (item.isEmpty()) {
-			return new TranslatableComponent(fallbackKey);
+			return new TranslationTextComponent(fallbackKey);
 		}
 
-		return item.getHoverName();
+		return item.getDisplayName();
 	}
 
 	static boolean isSocketable(ItemStack stack) {

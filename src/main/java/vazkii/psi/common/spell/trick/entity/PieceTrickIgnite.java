@@ -8,7 +8,7 @@
  */
 package vazkii.psi.common.spell.trick.entity;
 
-import net.minecraft.world.entity.Entity;
+import net.minecraft.entity.Entity;
 
 import vazkii.psi.api.spell.EnumSpellStat;
 import vazkii.psi.api.spell.Spell;
@@ -58,7 +58,7 @@ public class PieceTrickIgnite extends PieceTrick {
 		int timeVal = this.getParamValue(context, time).intValue();
 
 		context.verifyEntity(targetVal);
-		targetVal.setSecondsOnFire(timeVal);
+		targetVal.setFire(timeVal);
 
 		return null;
 	}

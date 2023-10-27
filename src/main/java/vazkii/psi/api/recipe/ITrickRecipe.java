@@ -8,13 +8,13 @@
  */
 package vazkii.psi.api.recipe;
 
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
 
 import vazkii.psi.api.PsiAPI;
@@ -23,7 +23,7 @@ import vazkii.psi.api.spell.piece.PieceCraftingTrick;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public interface ITrickRecipe extends Recipe<RecipeWrapper> {
+public interface ITrickRecipe extends IRecipe<RecipeWrapper> {
 	/** ID of the trick recipe type and the base recipe serializer. */
 	ResourceLocation TYPE_ID = new ResourceLocation(PsiAPI.MOD_ID, "trick_crafting");
 
@@ -43,7 +43,7 @@ public interface ITrickRecipe extends Recipe<RecipeWrapper> {
 
 	@Override
 	@Nonnull
-	ItemStack getResultItem();
+	ItemStack getRecipeOutput();
 
 	/**
 	 * @return a recommended minimum CAD assembly that can craft this recipe, for JEI display purposes.
@@ -52,8 +52,8 @@ public interface ITrickRecipe extends Recipe<RecipeWrapper> {
 
 	@Nonnull
 	@Override
-	default RecipeType<?> getType() {
-		return Registry.RECIPE_TYPE.get(TYPE_ID);
+	default IRecipeType<?> getType() {
+		return Registry.RECIPE_TYPE.getOrDefault(TYPE_ID);
 	}
 
 	@Nonnull

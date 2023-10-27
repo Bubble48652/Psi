@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "items": ["psi:ebony_substance"]
+            "item": "psi:ebony_substance"
           }
         ]
       }

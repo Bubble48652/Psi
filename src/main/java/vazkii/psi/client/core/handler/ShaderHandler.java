@@ -8,9 +8,9 @@
  */
 package vazkii.psi.client.core.handler;
 
-import com.google.common.io.CharStreams;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.ARBFragmentShader;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.ARBVertexShader;
@@ -21,6 +21,7 @@ import vazkii.psi.common.Psi;
 import vazkii.psi.common.core.handler.ConfigHandler;
 import vazkii.psi.common.lib.LibResources;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -79,8 +80,9 @@ public final class ShaderHandler {
 		useShader(0);
 	}
 
+	//TODO Need alternative to GLX.isNextGen();
 	public static boolean canUseShaders() {
-		RenderSystem.assertOnRenderThread();
+		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
 		return ConfigHandler.CLIENT.useShaders.get() && ((GL.getCapabilities().OpenGL14 && (GL.getCapabilities().GL_ARB_framebuffer_object || GL.getCapabilities().GL_EXT_framebuffer_object || GL.getCapabilities().OpenGL30))
 				&& (GL.getCapabilities().OpenGL21 || GL.getCapabilities().GL_ARB_fragment_shader && GL.getCapabilities().GL_ARB_fragment_shader && GL.getCapabilities().GL_ARB_shader_objects));
 	}
@@ -118,13 +120,13 @@ public final class ShaderHandler {
 
 		ARBShaderObjects.glLinkProgramARB(program);
 		if (ARBShaderObjects.glGetObjectParameteriARB(program, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB) == GL11.GL_FALSE) {
-			Psi.logger.error(getLogInfo(program));
+			Psi.logger.log(Level.ERROR, getLogInfo(program));
 			return 0;
 		}
 
 		ARBShaderObjects.glValidateProgramARB(program);
 		if (ARBShaderObjects.glGetObjectParameteriARB(program, ARBShaderObjects.GL_OBJECT_VALIDATE_STATUS_ARB) == GL11.GL_FALSE) {
-			Psi.logger.error(getLogInfo(program));
+			Psi.logger.log(Level.ERROR, getLogInfo(program));
 			return 0;
 		}
 
@@ -160,12 +162,56 @@ public final class ShaderHandler {
 	}
 
 	private static String readFileAsString(String filename) throws Exception {
-		try (InputStream in = ShaderHandler.class.getResourceAsStream(filename)) {
-			if (in == null) {
-				return "";
+		StringBuilder source = new StringBuilder();
+		InputStream in = ShaderHandler.class.getResourceAsStream(filename);
+		Exception exception = null;
+		BufferedReader reader;
+
+		if (in == null) {
+			return "";
+		}
+
+		try {
+			reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+
+			Exception innerExc = null;
+			try {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					source.append(line).append('\n');
+				}
+			} catch (Exception exc) {
+				exception = exc;
+			} finally {
+				try {
+					reader.close();
+				} catch (Exception exc) {
+					innerExc = exc;
+				}
 			}
 
-			return CharStreams.toString(new InputStreamReader(in, StandardCharsets.UTF_8));
+			if (innerExc != null) {
+				throw innerExc;
+			}
+		} catch (Exception exc) {
+			exception = exc;
+		} finally {
+			try {
+				in.close();
+			} catch (Exception exc) {
+				if (exception == null) {
+					exception = exc;
+				} else {
+					exc.printStackTrace();
+				}
+			}
+
+			if (exception != null) {
+				throw exception;
+			}
 		}
+
+		return source.toString();
 	}
+
 }

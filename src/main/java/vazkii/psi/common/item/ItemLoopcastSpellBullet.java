@@ -8,10 +8,9 @@
  */
 package vazkii.psi.common.item;
 
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.Item.Properties;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
 
 import vazkii.psi.api.spell.SpellContext;
 import vazkii.psi.common.core.handler.LoopcastTrackingHandler;
@@ -33,10 +32,8 @@ public class ItemLoopcastSpellBullet extends ItemSpellBullet {
 			data.loopcasting = true;
 			data.loopcastHand = context.castFrom;
 			data.lastTickLoopcastStack = null;
-			data.loopcastTime = 1;
-			data.loopcastAmount = 0;
-			if (context.caster instanceof ServerPlayer) {
-				LoopcastTrackingHandler.syncForTrackersAndSelf((ServerPlayer) context.caster);
+			if (context.caster instanceof ServerPlayerEntity) {
+				LoopcastTrackingHandler.syncForTrackersAndSelf((ServerPlayerEntity) context.caster);
 			}
 		}
 		return new ArrayList<>();

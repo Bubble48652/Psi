@@ -8,31 +8,31 @@
  */
 package vazkii.psi.client.gui.widget;
 
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class CallbackTextFieldWidget extends EditBox {
+public class CallbackTextFieldWidget extends TextFieldWidget {
 	protected final CallbackTextFieldWidget.IPressable pressable;
 
-	public CallbackTextFieldWidget(Font font, int x, int y, int width, int height, CallbackTextFieldWidget.IPressable pressable) {
-		super(font, x, y, width, height, null, TextComponent.EMPTY);
+	public CallbackTextFieldWidget(FontRenderer font, int x, int y, int width, int height, CallbackTextFieldWidget.IPressable pressable) {
+		super(font, x, y, width, height, null, StringTextComponent.EMPTY);
 		this.pressable = pressable;
 	}
 
 	@Override
-	public void insertText(String textToWrite) {
-		super.insertText(textToWrite);
+	public void writeText(String textToWrite) {
+		super.writeText(textToWrite);
 		onPress();
 	}
 
 	@Override
-	public void deleteChars(int num) {
-		super.deleteChars(num);
+	public void deleteFromCursor(int num) {
+		super.deleteFromCursor(num);
 		onPress();
 	}
 
@@ -48,6 +48,6 @@ public class CallbackTextFieldWidget extends EditBox {
 
 	@OnlyIn(Dist.CLIENT)
 	public interface IPressable {
-		void onPress(AbstractWidget p_onPress_1_);
+		void onPress(Widget p_onPress_1_);
 	}
 }

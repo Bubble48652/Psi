@@ -8,8 +8,8 @@
  */
 package vazkii.psi.common.spell.trick.potion;
 
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.Effects;
 
 import vazkii.psi.api.spell.Spell;
 
@@ -20,8 +20,8 @@ public class PieceTrickWaterBreathing extends PieceTrickPotionBase {
 	}
 
 	@Override
-	public MobEffect getPotion() {
-		return MobEffects.WATER_BREATHING;
+	public Effect getPotion() {
+		return Effects.WATER_BREATHING;
 	}
 
 	@Override

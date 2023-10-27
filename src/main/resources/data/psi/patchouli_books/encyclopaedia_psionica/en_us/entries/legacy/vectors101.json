@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.vectors101",
-  "category": "psi:legacy",
+  "category": "legacy",
   "icon": "psi:textures/spell/operator_vector_construct.png",
   "pages": [
     {

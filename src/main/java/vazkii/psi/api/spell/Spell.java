@@ -8,11 +8,11 @@
  */
 package vazkii.psi.api.spell;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.ModList;
@@ -46,12 +46,12 @@ public final class Spell {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void draw(PoseStack ms, MultiBufferSource buffers, int light) {
+	public void draw(MatrixStack ms, IRenderTypeBuffer buffers, int light) {
 		grid.draw(ms, buffers, light);
 	}
 
 	@Nullable
-	public static Spell createFromNBT(CompoundTag cmp) {
+	public static Spell createFromNBT(CompoundNBT cmp) {
 		if (cmp == null || !cmp.getBoolean(TAG_VALID)) {
 			return null;
 		}
@@ -61,7 +61,7 @@ public final class Spell {
 		return spell;
 	}
 
-	public void readFromNBT(CompoundTag cmp) {
+	public void readFromNBT(CompoundNBT cmp) {
 		name = cmp.getString(TAG_SPELL_NAME);
 
 		if (cmp.contains(TAG_UUID_MOST)) {
@@ -87,12 +87,12 @@ public final class Spell {
 		return temp;
 	}
 
-	public void writeToNBT(CompoundTag cmp) {
+	public void writeToNBT(CompoundNBT cmp) {
 		cmp.putBoolean(TAG_VALID, true);
 		cmp.putString(TAG_SPELL_NAME, name);
-		ListTag modList = new ListTag();
+		ListNBT modList = new ListNBT();
 		for (String namespace : getPieceNamespaces()) {
-			CompoundTag nbt = new CompoundTag();
+			CompoundNBT nbt = new CompoundNBT();
 			nbt.putString(TAG_MOD_NAME, namespace);
 			if (ModList.get().getModContainerById(namespace).isPresent()) {
 				nbt.putString(TAG_MOD_VERSION, ModList.get().getModContainerById(namespace).get().getModInfo().getVersion().toString());
@@ -107,7 +107,7 @@ public final class Spell {
 	}
 
 	public Spell copy() {
-		CompoundTag cmp = new CompoundTag();
+		CompoundNBT cmp = new CompoundNBT();
 		writeToNBT(cmp);
 		return createFromNBT(cmp);
 	}

@@ -8,7 +8,7 @@
  */
 package vazkii.psi.common.block.tile.container.slot;
 
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.SlotItemHandler;
 
@@ -27,12 +27,12 @@ public class SlotSocketable extends SlotItemHandler {
 	}
 
 	@Override
-	public boolean mayPlace(@Nonnull ItemStack stack) {
+	public boolean isItemValid(@Nonnull ItemStack stack) {
 		return ISocketable.isSocketable(stack);
 	}
 
 	@Override
-	public void setChanged() {
-		bullets.setStack(getItem());
+	public void onSlotChanged() {
+		bullets.setStack(getStack());
 	}
 }

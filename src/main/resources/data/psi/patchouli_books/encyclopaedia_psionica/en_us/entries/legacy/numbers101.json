@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.numbers101",
-  "category": "psi:legacy",
+  "category": "legacy",
   "icon": "psi:textures/spell/operator_sum.png",
   "pages": [
     {

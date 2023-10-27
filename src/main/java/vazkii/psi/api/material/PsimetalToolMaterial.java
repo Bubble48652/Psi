@@ -8,46 +8,46 @@
  */
 package vazkii.psi.api.material;
 
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.LazyLoadedValue;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.item.IItemTier;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.LazyValue;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 
 import vazkii.psi.api.PsiAPI;
 import vazkii.psi.common.core.handler.ConfigHandler;
 
-public class PsimetalToolMaterial implements Tier {
-	private static final LazyLoadedValue<Ingredient> REPAIR_MATERIAL = new LazyLoadedValue<>(
-			() -> Ingredient.of(Registry.ITEM.get(new ResourceLocation(PsiAPI.MOD_ID, "psimetal"))));
+public class PsimetalToolMaterial implements IItemTier {
+	private static final LazyValue<Ingredient> REPAIR_MATERIAL = new LazyValue<>(
+			() -> Ingredient.fromItems(Registry.ITEM.getOrDefault(new ResourceLocation(PsiAPI.MOD_ID, "psimetal"))));
 
 	@Override
-	public int getUses() {
+	public int getMaxUses() {
 		return 900;
 	}
 
 	@Override
-	public float getSpeed() {
+	public float getEfficiency() {
 		return 7.8F;
 	}
 
 	@Override
-	public float getAttackDamageBonus() {
+	public float getAttackDamage() {
 		return 2F;
 	}
 
 	@Override
-	public int getLevel() {
+	public int getHarvestLevel() {
 		return ConfigHandler.COMMON.HarvestLevel.get();
 	}
 
 	@Override
-	public int getEnchantmentValue() {
+	public int getEnchantability() {
 		return 12;
 	}
 
 	@Override
-	public Ingredient getRepairIngredient() {
-		return REPAIR_MATERIAL.get();
+	public Ingredient getRepairMaterial() {
+		return REPAIR_MATERIAL.getValue();
 	}
 }

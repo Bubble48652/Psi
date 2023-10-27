@@ -8,8 +8,8 @@
  */
 package vazkii.psi.api.spell;
 
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Hand;
 import net.minecraftforge.eventbus.api.Event;
 
 import vazkii.psi.api.internal.IPlayerData;
@@ -20,19 +20,19 @@ import vazkii.psi.api.internal.IPlayerData;
  */
 public class LoopcastEndEvent extends Event {
 
-	private final Player player;
+	private final PlayerEntity player;
 	private final IPlayerData playerData;
-	private final InteractionHand hand;
+	private final Hand hand;
 	private final int loopcastAmount;
 
-	public LoopcastEndEvent(Player player, IPlayerData playerData, InteractionHand hand, int loopcastAmount) {
+	public LoopcastEndEvent(PlayerEntity player, IPlayerData playerData, Hand hand, int loopcastAmount) {
 		this.player = player;
 		this.playerData = playerData;
 		this.hand = hand;
 		this.loopcastAmount = loopcastAmount;
 	}
 
-	public Player getPlayer() {
+	public PlayerEntity getPlayer() {
 		return player;
 	}
 
@@ -40,7 +40,7 @@ public class LoopcastEndEvent extends Event {
 		return playerData;
 	}
 
-	public InteractionHand getHand() {
+	public Hand getHand() {
 		return hand;
 	}
 

@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.movementAdvances",
-  "category": "psi:legacy",
+  "category": "legacy",
   "icon": "psi:textures/spell/trick_blink.png",
   "pages": [
     {

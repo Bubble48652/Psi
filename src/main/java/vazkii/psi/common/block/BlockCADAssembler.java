@@ -8,26 +8,25 @@
  */
 package vazkii.psi.common.block;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.HorizontalBlock;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.state.StateContainer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.network.NetworkHooks;
 
 import vazkii.psi.common.block.tile.TileCADAssembler;
 
@@ -36,32 +35,32 @@ import javax.annotation.Nullable;
 
 import static net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
 
-public class BlockCADAssembler extends HorizontalDirectionalBlock implements EntityBlock {
+public class BlockCADAssembler extends HorizontalBlock {
 
 	public BlockCADAssembler(Properties props) {
 		super(props);
 	}
 
 	@Override
-	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(FACING);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(HORIZONTAL_FACING);
 	}
 
 	@Override
-	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-		return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
+	public BlockState getStateForPlacement(BlockItemUseContext ctx) {
+		return getDefaultState().with(HORIZONTAL_FACING, ctx.getPlacementHorizontalFacing().getOpposite());
 	}
 
 	@Override
 	@SuppressWarnings("deprecation")
-	public boolean hasAnalogOutputSignal(BlockState state) {
+	public boolean hasComparatorInputOverride(BlockState state) {
 		return true;
 	}
 
 	@Override
 	@SuppressWarnings("deprecation")
-	public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
-		BlockEntity tile = worldIn.getBlockEntity(pos);
+	public int getComparatorInputOverride(BlockState blockState, World worldIn, BlockPos pos) {
+		TileEntity tile = worldIn.getTileEntity(pos);
 		if (tile != null) {
 			return tile.getCapability(ITEM_HANDLER_CAPABILITY)
 					.map(ItemHandlerHelper::calcRedstoneFromInventory)
@@ -72,47 +71,53 @@ public class BlockCADAssembler extends HorizontalDirectionalBlock implements Ent
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult rayTraceResult) {
-		if (!world.isClientSide) {
-			MenuProvider container = state.getMenuProvider(world, pos);
+	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult rayTraceResult) {
+		if (!world.isRemote) {
+			INamedContainerProvider container = state.getContainer(world, pos);
 			if (container != null) {
-				NetworkHooks.openGui((ServerPlayer) playerIn, container, pos);
-				return InteractionResult.SUCCESS;
+				NetworkHooks.openGui((ServerPlayerEntity) playerIn, container, pos);
+				return ActionResultType.SUCCESS;
 			}
 		}
-		return InteractionResult.SUCCESS;
+		return ActionResultType.SUCCESS;
 	}
 
 	@Nullable
 	@Override
-	public MenuProvider getMenuProvider(@Nonnull BlockState state, @Nonnull Level world, @Nonnull BlockPos pos) {
-		BlockEntity te = world.getBlockEntity(pos);
+	public INamedContainerProvider getContainer(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos) {
+		TileEntity te = world.getTileEntity(pos);
 		if (te instanceof TileCADAssembler) {
-			return (MenuProvider) te;
+			return (INamedContainerProvider) te;
 		}
 		return null;
 	}
 
 	@Override
-	public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-		return new TileCADAssembler(pos, state);
+	public boolean hasTileEntity(BlockState state) {
+		return true;
+	}
+
+	@Nullable
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+		return new TileCADAssembler();
 	}
 
 	@Override
-	public void onRemove(BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onReplaced(BlockState state, @Nonnull World world, @Nonnull BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock() && !isMoving) {
-			TileCADAssembler te = (TileCADAssembler) world.getBlockEntity(pos);
+			TileCADAssembler te = (TileCADAssembler) world.getTileEntity(pos);
 			if (te != null) {
 				for (int i = 0; i < te.getInventory().getSlots(); i++) {
 					ItemStack stack = te.getInventory().getStackInSlot(i);
 					if (!stack.isEmpty()) {
-						Containers.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+						InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), stack);
 					}
 				}
 			}
 		}
 
-		super.onRemove(state, world, pos, newState, isMoving);
+		super.onReplaced(state, world, pos, newState, isMoving);
 	}
 
 }

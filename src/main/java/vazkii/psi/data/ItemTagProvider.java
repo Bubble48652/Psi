@@ -9,7 +9,7 @@
 package vazkii.psi.data;
 
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.data.ItemTagsProvider;
 import net.minecraftforge.common.Tags;
 
 import vazkii.psi.common.item.base.ModItems;
@@ -21,27 +21,27 @@ public class ItemTagProvider extends ItemTagsProvider {
 	}
 
 	@Override
-	protected void addTags() {
+	protected void registerTags() {
 
-		tag(Tags.Items.DUSTS).add(ModItems.psidust);
-		tag(Tags.Items.INGOTS).add(ModItems.psimetal);
-		tag(Tags.Items.INGOTS).add(ModItems.ebonyPsimetal);
-		tag(Tags.Items.INGOTS).add(ModItems.ivoryPsimetal);
-		tag(Tags.Items.GEMS).add(ModItems.psigem);
+		getOrCreateBuilder(Tags.Items.DUSTS).addItemEntry(ModItems.psidust);
+		getOrCreateBuilder(Tags.Items.INGOTS).addItemEntry(ModItems.psimetal);
+		getOrCreateBuilder(Tags.Items.INGOTS).addItemEntry(ModItems.ebonyPsimetal);
+		getOrCreateBuilder(Tags.Items.INGOTS).addItemEntry(ModItems.ivoryPsimetal);
+		getOrCreateBuilder(Tags.Items.GEMS).addItemEntry(ModItems.psigem);
 
-		tag(ModTags.PSIDUST).add(ModItems.psidust);
-		tag(ModTags.EBONY_SUBSTANCE).add(ModItems.ebonySubstance);
-		tag(ModTags.IVORY_SUBSTANCE).add(ModItems.ivorySubstance);
+		getOrCreateBuilder(ModTags.PSIDUST).addItemEntry(ModItems.psidust);
+		getOrCreateBuilder(ModTags.EBONY_SUBSTANCE).addItemEntry(ModItems.ebonySubstance);
+		getOrCreateBuilder(ModTags.IVORY_SUBSTANCE).addItemEntry(ModItems.ivorySubstance);
 
-		tag(ModTags.INGOT_PSIMETAL).add(ModItems.psimetal);
+		getOrCreateBuilder(ModTags.INGOT_PSIMETAL).addItemEntry(ModItems.psimetal);
 		copy(ModTags.Blocks.BLOCK_PSIMETAL, ModTags.BLOCK_PSIMETAL);
 
-		tag(ModTags.GEM_PSIGEM).add(ModItems.psigem);
+		getOrCreateBuilder(ModTags.GEM_PSIGEM).addItemEntry(ModItems.psigem);
 		copy(ModTags.Blocks.BLOCK_PSIGEM, ModTags.BLOCK_PSIGEM);
 
-		tag(ModTags.INGOT_EBONY_PSIMETAL).add(ModItems.ebonyPsimetal);
+		getOrCreateBuilder(ModTags.INGOT_EBONY_PSIMETAL).addItemEntry(ModItems.ebonyPsimetal);
 		copy(ModTags.Blocks.BLOCK_EBONY_PSIMETAL, ModTags.BLOCK_EBONY_PSIMETAL);
-		tag(ModTags.INGOT_IVORY_PSIMETAL).add(ModItems.ivoryPsimetal);
+		getOrCreateBuilder(ModTags.INGOT_IVORY_PSIMETAL).addItemEntry(ModItems.ivoryPsimetal);
 		copy(ModTags.Blocks.BLOCK_IVORY_PSIMETAL, ModTags.BLOCK_IVORY_PSIMETAL);
 		copy(Tags.Blocks.STORAGE_BLOCKS, Tags.Items.STORAGE_BLOCKS);
 	}

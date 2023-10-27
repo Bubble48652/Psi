@@ -8,8 +8,8 @@
  */
 package vazkii.psi.common.spell.trick.potion;
 
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.Effects;
 
 import vazkii.psi.api.spell.EnumSpellStat;
 import vazkii.psi.api.spell.Spell;
@@ -26,8 +26,8 @@ public class PieceTrickResistance extends PieceTrickPotionBase {
 	}
 
 	@Override
-	public MobEffect getPotion() {
-		return MobEffects.DAMAGE_RESISTANCE;
+	public Effect getPotion() {
+		return Effects.RESISTANCE;
 	}
 
 	@Override

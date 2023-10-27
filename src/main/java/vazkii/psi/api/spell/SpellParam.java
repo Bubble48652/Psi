@@ -10,8 +10,8 @@ package vazkii.psi.api.spell;
 
 import com.google.common.base.CaseFormat;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 /**
  * Base abstract class for a spell parameter. See implementations
@@ -115,12 +115,12 @@ public abstract class SpellParam<T> {
 	/**
 	 * Gets the string for display for the required type.
 	 */
-	public Component getRequiredTypeString() {
+	public ITextComponent getRequiredTypeString() {
 		Class<T> evalType = getRequiredType();
 		String evalStr = evalType == null ? "null" : CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, evalType.getSimpleName());
-		TranslatableComponent s = new TranslatableComponent("psi.datatype." + evalStr);
+		TranslationTextComponent s = new TranslationTextComponent("psi.datatype." + evalStr);
 		if (requiresConstant()) {
-			s.append(" ").append(new TranslatableComponent("psimisc.constant"));
+			s.appendString(" ").append(new TranslationTextComponent("psimisc.constant"));
 		}
 
 		return s;

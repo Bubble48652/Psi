@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.spellDrive",
-  "category": "psi:items",
+  "category": "items",
   "icon": "psi:spell_drive",
   "priority": true,
   "pages": [

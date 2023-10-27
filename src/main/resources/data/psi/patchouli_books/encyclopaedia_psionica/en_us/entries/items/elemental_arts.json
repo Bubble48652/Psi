@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.elementalArts",
-  "category": "psi:items",
+  "category": "items",
   "icon": "psi:textures/spell/trick_smite.png",
   "pages": [
     {

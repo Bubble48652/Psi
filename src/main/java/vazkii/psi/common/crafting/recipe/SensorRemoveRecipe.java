@@ -8,33 +8,33 @@
  */
 package vazkii.psi.common.crafting.recipe;
 
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
-import net.minecraft.world.level.Level;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.SpecialRecipe;
+import net.minecraft.item.crafting.SpecialRecipeSerializer;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 
 import vazkii.psi.api.exosuit.ISensorHoldable;
 
 import javax.annotation.Nonnull;
 
-public class SensorRemoveRecipe extends CustomRecipe {
+public class SensorRemoveRecipe extends SpecialRecipe {
 
-	public static final SimpleRecipeSerializer<SensorRemoveRecipe> SERIALIZER = new SimpleRecipeSerializer<>(SensorRemoveRecipe::new);
+	public static final SpecialRecipeSerializer<SensorRemoveRecipe> SERIALIZER = new SpecialRecipeSerializer<>(SensorRemoveRecipe::new);
 
 	public SensorRemoveRecipe(ResourceLocation id) {
 		super(id);
 	}
 
 	@Override
-	public boolean matches(@Nonnull CraftingContainer inv, @Nonnull Level world) {
+	public boolean matches(@Nonnull CraftingInventory inv, @Nonnull World world) {
 		boolean foundHoldable = false;
 
-		for (int i = 0; i < inv.getContainerSize(); i++) {
-			ItemStack stack = inv.getItem(i);
+		for (int i = 0; i < inv.getSizeInventory(); i++) {
+			ItemStack stack = inv.getStackInSlot(i);
 			if (!stack.isEmpty()) {
 				if (!foundHoldable && stack.getItem() instanceof ISensorHoldable && !((ISensorHoldable) stack.getItem()).getAttachedSensor(stack).isEmpty()) {
 					foundHoldable = true;
@@ -49,11 +49,11 @@ public class SensorRemoveRecipe extends CustomRecipe {
 
 	@Nonnull
 	@Override
-	public ItemStack assemble(@Nonnull CraftingContainer inv) {
+	public ItemStack getCraftingResult(@Nonnull CraftingInventory inv) {
 		ItemStack holdableItem = ItemStack.EMPTY;
 
-		for (int i = 0; i < inv.getContainerSize(); i++) {
-			ItemStack stack = inv.getItem(i);
+		for (int i = 0; i < inv.getSizeInventory(); i++) {
+			ItemStack stack = inv.getStackInSlot(i);
 			if (!stack.isEmpty()) {
 				holdableItem = stack;
 			}
@@ -67,11 +67,11 @@ public class SensorRemoveRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
-		NonNullList<ItemStack> list = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
+	public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
+		NonNullList<ItemStack> list = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 
 		for (int i = 0; i < list.size(); ++i) {
-			ItemStack item = inv.getItem(i);
+			ItemStack item = inv.getStackInSlot(i);
 			if (item.getItem() instanceof ISensorHoldable) {
 				list.set(i, ((ISensorHoldable) item.getItem()).getAttachedSensor(item));
 				break;
@@ -83,17 +83,17 @@ public class SensorRemoveRecipe extends CustomRecipe {
 
 	@Nonnull
 	@Override
-	public RecipeSerializer<?> getSerializer() {
+	public IRecipeSerializer<?> getSerializer() {
 		return SERIALIZER;
 	}
 
 	@Override
-	public boolean canCraftInDimensions(int width, int height) {
+	public boolean canFit(int width, int height) {
 		return true;
 	}
 
 	@Override
-	public boolean isSpecial() {
+	public boolean isDynamic() {
 		return true;
 	}
 

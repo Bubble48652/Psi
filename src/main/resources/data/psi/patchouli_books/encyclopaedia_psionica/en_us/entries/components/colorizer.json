@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.colorizer",
-  "category": "psi:components",
+  "category": "components",
   "icon": "psi:cad_colorizer_psi",
   "pages": [
     {

@@ -9,20 +9,23 @@
 package vazkii.psi.client.gui;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 
 import org.lwjgl.opengl.GL11;
 
@@ -58,7 +61,7 @@ public class GuiSocketSelect extends Screen {
 	final Minecraft mc;
 
 	public GuiSocketSelect(ItemStack stack) {
-		super(new TextComponent(""));
+		super(new StringTextComponent(""));
 		mc = Minecraft.getInstance();
 
 		controllerStack = ItemStack.EMPTY;
@@ -92,7 +95,7 @@ public class GuiSocketSelect extends Screen {
 	}
 
 	@Override
-	public void render(PoseStack ms, int mx, int my, float partialTicks) {
+	public void render(MatrixStack ms, int mx, int my, float partialTicks) {
 		super.render(ms, mx, my, partialTicks);
 
 		int x = width / 2;
@@ -108,14 +111,14 @@ public class GuiSocketSelect extends Screen {
 		ItemStack cadStack = PsiAPI.getPlayerCAD(Minecraft.getInstance().player);
 		slotSelected = -1;
 
-		Tesselator tess = Tesselator.getInstance();
-		BufferBuilder buf = tess.getBuilder();
+		Tessellator tess = Tessellator.getInstance();
+		BufferBuilder buf = tess.getBuffer();
 
 		RenderSystem.disableCull();
 		RenderSystem.disableTexture();
 		RenderSystem.enableBlend();
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
-		buf.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		RenderSystem.shadeModel(GL11.GL_SMOOTH);
+		buf.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
 
 		for (int seg = 0; seg < segments; seg++) {
 			boolean mouseInSector = degPer * seg < angle && angle < degPer * (seg + 1);
@@ -134,7 +137,7 @@ public class GuiSocketSelect extends Screen {
 			int a = 0x66;
 
 			if (seg == 0) {
-				buf.vertex(x, y, 0).color(r, g, b, a).endVertex();
+				buf.pos(x, y, 0).color(r, g, b, a).endVertex();
 			}
 
 			if (mouseInSector) {
@@ -163,17 +166,18 @@ public class GuiSocketSelect extends Screen {
 
 			for (float i = 0; i < degPer + step / 2; i += step) {
 				float rad = i + seg * degPer;
-				float xp = x + Mth.cos(rad) * radius;
-				float yp = y + Mth.sin(rad) * radius;
+				float xp = x + MathHelper.cos(rad) * radius;
+				float yp = y + MathHelper.sin(rad) * radius;
 
 				if (i == 0) {
-					buf.vertex(xp, yp, 0).color(r, g, b, a).endVertex();
+					buf.pos(xp, yp, 0).color(r, g, b, a).endVertex();
 				}
-				buf.vertex(xp, yp, 0).color(r, g, b, a).endVertex();
+				buf.pos(xp, yp, 0).color(r, g, b, a).endVertex();
 			}
 		}
-		tess.end();
+		tess.draw();
 
+		RenderSystem.shadeModel(GL11.GL_FLAT);
 		RenderSystem.enableTexture();
 
 		for (int seg = 0; seg < segments; seg++) {
@@ -184,21 +188,21 @@ public class GuiSocketSelect extends Screen {
 			}
 
 			float rad = (seg + 0.5f) * degPer;
-			float xp = x + Mth.cos(rad) * radius;
-			float yp = y + Mth.sin(rad) * radius;
+			float xp = x + MathHelper.cos(rad) * radius;
+			float yp = y + MathHelper.sin(rad) * radius;
 
 			ItemStack stack = socketable.getBulletInSocket(seg);
 			if (!stack.isEmpty()) {
 				float xsp = xp - 4;
 				float ysp = yp;
-				String name = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + stack.getHoverName().getString();
-				int width = font.width(name);
+				String name = (mouseInSector ? TextFormatting.UNDERLINE : TextFormatting.RESET) + stack.getDisplayName().getString();
+				int width = font.getStringWidth(name);
 
 				double mod = 0.6;
 				int xdp = (int) ((xp - x) * mod + x);
 				int ydp = (int) ((yp - y) * mod + y);
 
-				mc.getItemRenderer().renderGuiItem(stack, xdp - 8, ydp - 8);
+				mc.getItemRenderer().renderItemIntoGUI(stack, xdp - 8, ydp - 8);
 
 				if (xsp < x) {
 					xsp -= width - 8;
@@ -207,59 +211,59 @@ public class GuiSocketSelect extends Screen {
 					ysp -= 9;
 				}
 
-				font.drawShadow(ms, name, xsp, ysp, 0xFFFFFF);
+				font.drawStringWithShadow(ms, name, xsp, ysp, 0xFFFFFF);
 				if (seg == socketable.getSelectedSlot()) {
 					int color = 0x00FF00;
 					if (!cadStack.isEmpty()) {
 						color = 0xFF0000 - Psi.proxy.getColorForCAD(cadStack);
 					}
-					font.drawShadow(ms, I18n.get("psimisc.selected"), xsp + width / 4, ysp + font.lineHeight, color);
+					font.drawStringWithShadow(ms, I18n.format("psimisc.selected"), xsp + width / 4, ysp + font.FONT_HEIGHT, color);
 				}
 
 				mod = 0.8;
 				xdp = (int) ((xp - x) * mod + x);
 				ydp = (int) ((yp - y) * mod + y);
 
-				RenderSystem.setShaderTexture(0, signs.get(seg));
+				mc.textureManager.bindTexture(signs.get(seg));
 				blit(ms, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16, 94 + SpellGrid.GRID_SIZE * 18, 94 + SpellGrid.GRID_SIZE * 18);
 			}
 		}
 
 		float shift = Math.min(5, timeIn + partialTicks) / 5;
 		float scale = 3 * shift;
+		RenderSystem.enableRescaleNormal();
 		RenderSystem.enableBlend();
 		RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-		//RenderSystem.enableLighting();
-		//RenderSystem.enableColorMaterial();
+		RenderSystem.enableLighting();
+		RenderSystem.enableColorMaterial();
 
 		if (controlledStacks != null && controlledStacks.length > 0) {
-			int xs = width / 2 - 18 * controlledStacks.length / 2 + 1;
+			int xs = width / 2 - 18 * controlledStacks.length / 2;
 			int ys = height / 2;
 
 			for (int i = 0; i < controlledStacks.length; i++) {
-				float yoff = 20F + maxRadius;
+				float yoff = 25F + maxRadius;
 				if (i == controlSlot) {
 					yoff += 5F;
 				}
 
 				ItemStack stack = controlledStacks[i];
-				int rx = xs + i * 18;
-				float ry = ys + (-yoff * shift);
-				PsiRenderHelper.transferMsToGl(ms, () -> mc.getItemRenderer().renderAndDecorateItem(stack, rx, (int) ry));
+				float rx = xs + i * 18 + (-yoff * shift);
+				PsiRenderHelper.transferMsToGl(ms, () -> mc.getItemRenderer().renderItemAndEffectIntoGUI(stack, (int) rx, ys));
 			}
 
 		}
 
 		if (!socketableStack.isEmpty()) {
-			ms.pushPose();
+			ms.push();
 			ms.scale(scale, scale, scale);
-			PsiRenderHelper.transferMsToGl(ms, () -> mc.getItemRenderer().renderAndDecorateItem(socketableStack,
+			PsiRenderHelper.transferMsToGl(ms, () -> mc.getItemRenderer().renderItemAndEffectIntoGUI(socketableStack,
 					(int) (x / scale) - 8, (int) (y / scale) - 8));
-			ms.popPose();
+			ms.pop();
 		}
-		//Lighting.turnOff();
+		RenderHelper.disableStandardItemLighting();
 		RenderSystem.disableBlend();
-		//RenderSystem.disableRescaleNormal();
+		RenderSystem.disableRescaleNormal();
 
 	}
 
@@ -290,7 +294,7 @@ public class GuiSocketSelect extends Screen {
 	public void tick() {
 		super.tick();
 		if (!isKeyDown(KeybindHandler.keybind)) {
-			mc.setScreen(null);
+			mc.displayGuiScreen(null);
 			if (slotSelected != -1) {
 				int slot = slots.get(slotSelected);
 				PlayerDataHandler.get(mc.player).stopLoopcast();
@@ -305,20 +309,20 @@ public class GuiSocketSelect extends Screen {
 			}
 		}
 
-		ImmutableSet<KeyMapping> set = ImmutableSet.of(mc.options.keyUp, mc.options.keyLeft, mc.options.keyDown, mc.options.keyRight, mc.options.keyShift, mc.options.keySprint, mc.options.keyJump);
-		for (KeyMapping k : set) {
-			KeyMapping.set(k.getKey(), isKeyDown(k));
+		ImmutableSet<KeyBinding> set = ImmutableSet.of(mc.gameSettings.keyBindForward, mc.gameSettings.keyBindLeft, mc.gameSettings.keyBindBack, mc.gameSettings.keyBindRight, mc.gameSettings.keyBindSneak, mc.gameSettings.keyBindSprint, mc.gameSettings.keyBindJump);
+		for (KeyBinding k : set) {
+			KeyBinding.setKeyBindState(k.getKey(), isKeyDown(k));
 		}
 
 		timeIn++;
 	}
 
-	public boolean isKeyDown(KeyMapping keybind) {
-		InputConstants.Key key = keybind.getKey();
-		if (key.getType() == InputConstants.Type.MOUSE) {
-			return keybind.isDown();
+	public boolean isKeyDown(KeyBinding keybind) {
+		InputMappings.Input key = keybind.getKey();
+		if (key.getType() == InputMappings.Type.MOUSE) {
+			return keybind.isKeyDown();
 		}
-		return InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), key.getValue());
+		return InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), key.getKeyCode());
 	}
 
 	@Override
@@ -327,7 +331,7 @@ public class GuiSocketSelect extends Screen {
 	}
 
 	private static double mouseAngle(int x, int y, int mx, int my) {
-		return (Mth.atan2(my - y, mx - x) + Math.PI * 2) % (Math.PI * 2);
+		return (MathHelper.atan2(my - y, mx - x) + Math.PI * 2) % (Math.PI * 2);
 	}
 
 }

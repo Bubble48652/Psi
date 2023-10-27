@@ -8,11 +8,11 @@
  */
 package vazkii.psi.client.patchouli;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.ResourceLocation;
 
 import vazkii.patchouli.api.IComponentRenderContext;
 import vazkii.patchouli.api.ICustomComponent;
@@ -39,17 +39,17 @@ public class SpellPieceComponent implements ICustomComponent {
 	}
 
 	@Override
-	public void render(PoseStack ms, IComponentRenderContext context, float pticks, int mouseX, int mouseY) {
-		MultiBufferSource.BufferSource buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-		ms.pushPose();
+	public void render(MatrixStack ms, IComponentRenderContext context, float pticks, int mouseX, int mouseY) {
+		IRenderTypeBuffer.Impl buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+		ms.push();
 		ms.translate(x, y, 0);
 		piece.draw(ms, buffer, 0xF000F0);
-		buffer.endBatch();
+		buffer.finish();
 
 		if (context.isAreaHovered(mouseX, mouseY, x - 1, y - 1, 16, 16)) {
 			PatchouliUtils.setPieceTooltip(context, piece);
 		}
-		ms.popPose();
+		ms.pop();
 	}
 
 	@Override

@@ -8,19 +8,19 @@
  */
 package vazkii.psi.client.model;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ItemOverrideList;
+import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -36,12 +36,12 @@ import java.util.List;
 import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
-public class ModelCAD implements BakedModel {
+public class ModelCAD implements IBakedModel {
 
-	private final ItemOverrides itemHandler = new ItemOverrides() {
+	private final ItemOverrideList itemHandler = new ItemOverrideList() {
 		@Nullable
 		@Override
-		public BakedModel resolve(BakedModel model, ItemStack stack, @Nullable ClientLevel world, @Nullable LivingEntity entity, int mode) {
+		public IBakedModel getOverrideModel(IBakedModel model, ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity entity) {
 			ICAD cad = (ICAD) stack.getItem();
 			ItemStack assemblyStack = cad.getComponentInSlot(stack, EnumCADComponent.ASSEMBLY);
 			if (assemblyStack.isEmpty()) {
@@ -58,7 +58,7 @@ public class ModelCAD implements BakedModel {
 	}
 
 	@Override
-	public boolean useAmbientOcclusion() {
+	public boolean isAmbientOcclusion() {
 		return true;
 	}
 
@@ -68,24 +68,24 @@ public class ModelCAD implements BakedModel {
 	}
 
 	@Override
-	public boolean usesBlockLight() {
+	public boolean isSideLit() {
 		return true;
 	}
 
 	@Override
-	public boolean isCustomRenderer() {
+	public boolean isBuiltInRenderer() {
 		return false;
 	}
 
 	@Nonnull
 	@Override
-	public TextureAtlasSprite getParticleIcon() {
-		return Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(MissingTextureAtlasSprite.getLocation());
+	public TextureAtlasSprite getParticleTexture() {
+		return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(MissingTextureSprite.getLocation());
 	}
 
 	@Nonnull
 	@Override
-	public ItemOverrides getOverrides() {
+	public ItemOverrideList getOverrides() {
 		return itemHandler;
 	}
 

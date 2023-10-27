@@ -8,15 +8,15 @@
  */
 package vazkii.psi.mixin.client;
 
-import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderState;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(RenderStateShard.class)
+@Mixin(RenderState.class)
 public interface AccessorRenderState {
 	@Accessor("TRANSLUCENT_TRANSPARENCY")
-	static RenderStateShard.TransparencyStateShard getTranslucentTransprency() {
+	static RenderState.TransparencyState getTranslucentTransprency() {
 		throw new IllegalStateException();
 	}
 }

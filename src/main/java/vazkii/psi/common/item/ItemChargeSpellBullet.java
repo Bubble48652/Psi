@@ -8,9 +8,8 @@
  */
 package vazkii.psi.common.item;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.Item.Properties;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 
 import vazkii.psi.api.PsiAPI;
 import vazkii.psi.api.cad.EnumCADComponent;
@@ -31,10 +30,10 @@ public class ItemChargeSpellBullet extends ItemSpellBullet {
 		ItemStack cad = PsiAPI.getPlayerCAD(context.caster);
 		ItemStack colorizer = ((ICAD) cad.getItem()).getComponentInSlot(cad, EnumCADComponent.DYE);
 
-		EntitySpellCharge projectile = new EntitySpellCharge(context.caster.getCommandSenderWorld(), context.caster);
+		EntitySpellCharge projectile = new EntitySpellCharge(context.caster.getEntityWorld(), context.caster);
 		projectile.setInfo(context.caster, colorizer, stack);
 		projectile.context = context;
-		projectile.getCommandSenderWorld().addFreshEntity(projectile);
+		projectile.getEntityWorld().addEntity(projectile);
 		ArrayList<Entity> spellEntities = new ArrayList<>();
 		spellEntities.add(projectile);
 		return spellEntities;

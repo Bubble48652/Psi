@@ -10,8 +10,6 @@ package vazkii.psi.api.spell;
 
 import vazkii.psi.api.cad.EnumCADStat;
 
-import java.util.Locale;
-
 /**
  * An Enum defining all spell stats and the CAD stats to compare against.
  */
@@ -34,7 +32,7 @@ public enum EnumSpellStat {
 	}
 
 	public String getName() {
-		return "psi.spellstat." + name().toLowerCase(Locale.ROOT);
+		return "psi.spellstat." + name().toLowerCase();
 	}
 
 	public String getDesc() {

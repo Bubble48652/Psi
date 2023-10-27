@@ -9,7 +9,7 @@
 package vazkii.psi.client.jei.tricks;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -18,12 +18,11 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 
 import vazkii.psi.api.ClientPsiAPI;
 import vazkii.psi.api.recipe.ITrickRecipe;
@@ -34,7 +33,11 @@ import vazkii.psi.common.lib.LibMisc;
 
 import javax.annotation.Nonnull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TrickCraftingCategory implements IRecipeCategory<ITrickRecipe> {
 	public static final ResourceLocation UID = new ResourceLocation(LibMisc.MOD_ID, "trick");
@@ -75,8 +78,8 @@ public class TrickCraftingCategory implements IRecipeCategory<ITrickRecipe> {
 
 	@Nonnull
 	@Override
-	public Component getTitle() {
-		return new TextComponent(I18n.get("jei." + LibMisc.MOD_ID + ".category.trick"));
+	public String getTitle() {
+		return I18n.format("jei." + LibMisc.MOD_ID + ".category.trick");
 	}
 
 	@Nonnull
@@ -94,22 +97,22 @@ public class TrickCraftingCategory implements IRecipeCategory<ITrickRecipe> {
 	@Override
 	public void setIngredients(ITrickRecipe recipe, IIngredients ingredients) {
 		ingredients.setInputLists(VanillaTypes.ITEM, ImmutableList.of(
-				ImmutableList.copyOf(recipe.getInput().getItems()), ImmutableList.of(recipe.getAssembly())
+				ImmutableList.copyOf(recipe.getInput().getMatchingStacks()), ImmutableList.of(recipe.getAssembly())
 		));
-		ingredients.setOutput(VanillaTypes.ITEM, recipe.getResultItem());
+		ingredients.setOutput(VanillaTypes.ITEM, recipe.getRecipeOutput());
 	}
 
 	@Override
-	public void draw(ITrickRecipe recipe, PoseStack matrixStack, double mouseX, double mouseY) {
+	public void draw(ITrickRecipe recipe, MatrixStack matrixStack, double mouseX, double mouseY) {
 		if (recipe.getPiece() != null) {
 			IDrawable trickIcon = trickIcons.computeIfAbsent(recipe.getPiece().registryKey,
 					key -> {
-						Material mat = ClientPsiAPI.getSpellPieceMaterial(key);
+						RenderMaterial mat = ClientPsiAPI.getSpellPieceMaterial(key);
 						if (mat == null) {
 							Psi.logger.warn("Not rendering complex (or missing) render for {}", key);
 							return helper.createBlankDrawable(16, 16);
 						}
-						return new DrawableTAS(mat.sprite());
+						return new DrawableTAS(mat.getSprite());
 					});
 
 			trickIcon.draw(matrixStack, trickX, trickY);
@@ -122,9 +125,9 @@ public class TrickCraftingCategory implements IRecipeCategory<ITrickRecipe> {
 
 	@Nonnull
 	@Override
-	public List<Component> getTooltipStrings(ITrickRecipe recipe, double mouseX, double mouseY) {
+	public List<ITextComponent> getTooltipStrings(ITrickRecipe recipe, double mouseX, double mouseY) {
 		if (recipe.getPiece() != null && onTrick(mouseX, mouseY)) {
-			List<Component> tooltip = new ArrayList<>();
+			List<ITextComponent> tooltip = new ArrayList<>();
 			recipe.getPiece().getTooltip(tooltip);
 			return tooltip;
 		}

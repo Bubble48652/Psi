@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.assembly",
-  "category": "psi:components",
+  "category": "components",
   "icon": "psi:cad_assembly_iron",
   "pages": [
     {

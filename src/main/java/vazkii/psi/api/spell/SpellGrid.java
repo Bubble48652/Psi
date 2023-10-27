@@ -10,11 +10,11 @@ package vazkii.psi.api.spell;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import vazkii.psi.common.core.handler.ConfigHandler;
@@ -46,15 +46,15 @@ public final class SpellGrid {
 	private int leftmost, rightmost, topmost, bottommost;
 
 	@OnlyIn(Dist.CLIENT)
-	public void draw(PoseStack ms, MultiBufferSource buffers, int light) {
+	public void draw(MatrixStack ms, IRenderTypeBuffer buffers, int light) {
 		for (int i = 0; i < GRID_SIZE; i++) {
 			for (int j = 0; j < GRID_SIZE; j++) {
 				SpellPiece p = gridData[i][j];
 				if (p != null) {
-					ms.pushPose();
+					ms.push();
 					ms.translate(i * 18, j * 18, 0);
 					p.draw(ms, buffers, light);
-					ms.popPose();
+					ms.pop();
 				}
 			}
 		}
@@ -263,13 +263,13 @@ public final class SpellGrid {
 		return true;
 	}
 
-	public void readFromNBT(CompoundTag cmp) {
+	public void readFromNBT(CompoundNBT cmp) {
 		gridData = new SpellPiece[GRID_SIZE][GRID_SIZE];
 
-		ListTag list = cmp.getList(TAG_SPELL_LIST, 10);
+		ListNBT list = cmp.getList(TAG_SPELL_LIST, 10);
 		int len = list.size();
 		for (int i = 0; i < len; i++) {
-			CompoundTag lcmp = list.getCompound(i);
+			CompoundNBT lcmp = list.getCompound(i);
 			int posX, posY;
 
 			if (lcmp.contains(TAG_SPELL_POS_X_LEGACY)) {
@@ -280,7 +280,7 @@ public final class SpellGrid {
 				posY = lcmp.getInt(TAG_SPELL_POS_Y);
 			}
 
-			CompoundTag data;
+			CompoundNBT data;
 			if (lcmp.contains(TAG_SPELL_DATA_LEGACY)) {
 				data = lcmp.getCompound(TAG_SPELL_DATA_LEGACY);
 			} else {
@@ -297,17 +297,17 @@ public final class SpellGrid {
 		}
 	}
 
-	public void writeToNBT(CompoundTag cmp) {
-		ListTag list = new ListTag();
+	public void writeToNBT(CompoundNBT cmp) {
+		ListNBT list = new ListNBT();
 		for (int i = 0; i < GRID_SIZE; i++) {
 			for (int j = 0; j < GRID_SIZE; j++) {
 				SpellPiece piece = gridData[i][j];
 				if (piece != null) {
-					CompoundTag lcmp = new CompoundTag();
+					CompoundNBT lcmp = new CompoundNBT();
 					lcmp.putInt(TAG_SPELL_POS_X, i);
 					lcmp.putInt(TAG_SPELL_POS_Y, j);
 
-					CompoundTag data = new CompoundTag();
+					CompoundNBT data = new CompoundNBT();
 					piece.writeToNBT(data);
 					lcmp.put(TAG_SPELL_DATA, data);
 
@@ -322,6 +322,6 @@ public final class SpellGrid {
 	// TODO: Put this somewhere nicer, or track down a library? Not sure where
 	@FunctionalInterface
 	public interface SpellPieceConsumer {
-		void accept(SpellPiece piece) throws SpellCompilationException;
+		public void accept(SpellPiece piece) throws SpellCompilationException;
 	}
 }

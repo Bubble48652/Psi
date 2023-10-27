@@ -10,18 +10,18 @@ package vazkii.psi.common.block.tile.container;
 
 import com.mojang.datafixers.util.Pair;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -43,11 +43,11 @@ import vazkii.psi.common.lib.LibMisc;
 
 import javax.annotation.Nonnull;
 
-public class ContainerCADAssembler extends AbstractContainerMenu {
+public class ContainerCADAssembler extends Container {
 	@ObjectHolder(LibMisc.PREFIX_MOD + LibBlockNames.CAD_ASSEMBLER)
-	public static MenuType<ContainerCADAssembler> TYPE;
+	public static ContainerType<ContainerCADAssembler> TYPE;
 
-	private static final EquipmentSlot[] equipmentSlots = new EquipmentSlot[] { EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET };
+	private static final EquipmentSlotType[] equipmentSlots = new EquipmentSlotType[] { EquipmentSlotType.HEAD, EquipmentSlotType.CHEST, EquipmentSlotType.LEGS, EquipmentSlotType.FEET };
 
 	public final TileCADAssembler assembler;
 
@@ -62,15 +62,15 @@ public class ContainerCADAssembler extends AbstractContainerMenu {
 	private final int hotbarEnd;
 	private final int armorStart;
 
-	public static ContainerCADAssembler fromNetwork(int windowId, Inventory playerInventory, FriendlyByteBuf buf) {
+	public static ContainerCADAssembler fromNetwork(int windowId, PlayerInventory playerInventory, PacketBuffer buf) {
 		BlockPos pos = buf.readBlockPos();
-		return new ContainerCADAssembler(windowId, playerInventory, (TileCADAssembler) playerInventory.player.level.getBlockEntity(pos));
+		return new ContainerCADAssembler(windowId, playerInventory, (TileCADAssembler) playerInventory.player.world.getTileEntity(pos));
 	}
 
-	public ContainerCADAssembler(int windowId, Inventory playerInventory, TileCADAssembler assembler) {
+	public ContainerCADAssembler(int windowId, PlayerInventory playerInventory, TileCADAssembler assembler) {
 		super(TYPE, windowId);
-		Player player = playerInventory.player;
-		int playerSize = playerInventory.getContainerSize();
+		PlayerEntity player = playerInventory.player;
+		int playerSize = playerInventory.getSizeInventory();
 
 		this.assembler = assembler;
 		IItemHandlerModifiable assemblerInv = assembler.getInventory();
@@ -81,62 +81,62 @@ public class ContainerCADAssembler extends AbstractContainerMenu {
 
 		addSlot(new SlotCADOutput(output, assembler, 120, 35));
 
-		cadComponentStart = slots.size();
+		cadComponentStart = inventorySlots.size();
 		addSlot(new SlotItemHandler(assemblerInv, assembler.getComponentSlot(EnumCADComponent.ASSEMBLY), 120, 91));
 		addSlot(new SlotItemHandler(assemblerInv, assembler.getComponentSlot(EnumCADComponent.CORE), 100, 91));
 		addSlot(new SlotItemHandler(assemblerInv, assembler.getComponentSlot(EnumCADComponent.SOCKET), 140, 91));
 		addSlot(new SlotItemHandler(assemblerInv, assembler.getComponentSlot(EnumCADComponent.BATTERY), 110, 111));
 		addSlot(new SlotItemHandler(assemblerInv, assembler.getComponentSlot(EnumCADComponent.DYE), 130, 111));
 
-		socketableStart = slots.size();
+		socketableStart = inventorySlots.size();
 		addSlot(new SlotSocketable(assemblerInv, bullets, 0, 35, 21));
-		socketableEnd = slots.size();
+		socketableEnd = inventorySlots.size();
 
-		bulletStart = slots.size();
+		bulletStart = inventorySlots.size();
 		for (int row = 0; row < 4; row++) {
 			for (int col = 0; col < 3; col++) {
 				addSlot(new ValidatorSlot(bullets, col + row * 3, 17 + col * 18, 57 + row * 18));
 			}
 		}
-		bulletEnd = slots.size();
+		bulletEnd = inventorySlots.size();
 
 		int xs = 48;
 		int ys = 143;
 
-		playerStart = slots.size();
+		playerStart = inventorySlots.size();
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
 				addSlot(new Slot(playerInventory, col + row * 9 + 9, xs + col * 18, ys + row * 18));
 			}
 		}
-		playerEnd = slots.size();
+		playerEnd = inventorySlots.size();
 
-		hotbarStart = slots.size();
+		hotbarStart = inventorySlots.size();
 		for (int col = 0; col < 9; col++) {
 			addSlot(new Slot(playerInventory, col, xs + col * 18, ys + 58));
 		}
-		hotbarEnd = slots.size();
+		hotbarEnd = inventorySlots.size();
 
-		armorStart = slots.size();
+		armorStart = inventorySlots.size();
 		for (int armorSlot = 0; armorSlot < 4; armorSlot++) {
-			final EquipmentSlot slot = equipmentSlots[armorSlot];
+			final EquipmentSlotType slot = equipmentSlots[armorSlot];
 
 			addSlot(new Slot(playerInventory, playerSize - 2 - armorSlot,
 					xs - 27, ys + 18 * armorSlot) {
 				@Override
-				public int getMaxStackSize() {
+				public int getSlotStackLimit() {
 					return 1;
 				}
 
 				@Override
-				public boolean mayPlace(ItemStack stack) {
+				public boolean isItemValid(ItemStack stack) {
 					return !stack.isEmpty() && stack.getItem().canEquip(stack, slot, player);
 				}
 
 				@OnlyIn(Dist.CLIENT)
 				@Override
-				public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-					return Pair.of(InventoryMenu.BLOCK_ATLAS, InventoryMenu.TEXTURE_EMPTY_SLOTS[slot.getIndex()]);
+				public Pair<ResourceLocation, ResourceLocation> getBackground() {
+					return Pair.of(PlayerContainer.LOCATION_BLOCKS_TEXTURE, PlayerContainer.ARMOR_SLOT_TEXTURES[slot.getIndex()]);
 				}
 			});
 		}
@@ -144,64 +144,64 @@ public class ContainerCADAssembler extends AbstractContainerMenu {
 		addSlot(new Slot(playerInventory, playerSize - 1, 219, 143) {
 			@OnlyIn(Dist.CLIENT)
 			@Override
-			public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-				return Pair.of(InventoryMenu.BLOCK_ATLAS, InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD);
+			public Pair<ResourceLocation, ResourceLocation> getBackground() {
+				return Pair.of(PlayerContainer.LOCATION_BLOCKS_TEXTURE, PlayerContainer.EMPTY_ARMOR_SLOT_SHIELD);
 			}
 		});
 	}
 
 	@Override
-	public boolean stillValid(@Nonnull Player playerIn) {
-		return !playerIn.isRemoved() && assembler.getBlockPos().distToCenterSqr(playerIn.position()) <= 64;
+	public boolean canInteractWith(@Nonnull PlayerEntity playerIn) {
+		return assembler.getPos().distanceSq(playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ(), true) <= 64;
 	}
 
 	@Nonnull
 	@Override
-	public ItemStack quickMoveStack(Player playerIn, int from) {
+	public ItemStack transferStackInSlot(PlayerEntity playerIn, int from) {
 		ItemStack mergeStack = ItemStack.EMPTY;
-		Slot slot = slots.get(from);
+		Slot slot = inventorySlots.get(from);
 
-		if (slot != null && slot.hasItem()) {
-			ItemStack stackInSlot = slot.getItem();
+		if (slot != null && slot.getHasStack()) {
+			ItemStack stackInSlot = slot.getStack();
 			mergeStack = stackInSlot.copy();
 
 			if (from >= playerStart) {
 				if (stackInSlot.getItem() instanceof ICADComponent) {
 					EnumCADComponent componentType = ((ICADComponent) stackInSlot.getItem()).getComponentType(stackInSlot);
 					int componentSlot = cadComponentStart + componentType.ordinal();
-					if (!moveItemStackTo(stackInSlot, componentSlot, componentSlot + 1, false)) {
+					if (!mergeItemStack(stackInSlot, componentSlot, componentSlot + 1, false)) {
 						return ItemStack.EMPTY;
 					}
 				} else if (ISocketable.isSocketable(stackInSlot)) {
-					if (!moveItemStackTo(stackInSlot, socketableStart, socketableEnd, false)) {
+					if (!mergeItemStack(stackInSlot, socketableStart, socketableEnd, false)) {
 						return ItemStack.EMPTY;
 					}
 				} else if (ISpellAcceptor.isContainer(stackInSlot)) {
-					if (!moveItemStackTo(stackInSlot, bulletStart, bulletEnd, false)) {
+					if (!mergeItemStack(stackInSlot, bulletStart, bulletEnd, false)) {
 						return ItemStack.EMPTY;
 					}
 				} else if (from < hotbarStart) {
-					if (!moveItemStackTo(stackInSlot, hotbarStart, hotbarEnd, true)) {
+					if (!mergeItemStack(stackInSlot, hotbarStart, hotbarEnd, true)) {
 						return ItemStack.EMPTY;
 					}
-				} else if (!moveItemStackTo(stackInSlot, playerStart, playerEnd, false)) {
+				} else if (!mergeItemStack(stackInSlot, playerStart, playerEnd, false)) {
 					return ItemStack.EMPTY;
 				}
 			} else if (stackInSlot.getItem() instanceof ArmorItem) {
 				ArmorItem armor = (ArmorItem) stackInSlot.getItem();
-				int armorSlot = armorStart + armor.getSlot().getFilterFlag() - 1;
-				if (!moveItemStackTo(stackInSlot, armorSlot, armorSlot + 1, true) &&
-						!moveItemStackTo(stackInSlot, playerStart, hotbarEnd, true)) {
+				int armorSlot = armorStart + armor.getEquipmentSlot().getSlotIndex() - 1;
+				if (!mergeItemStack(stackInSlot, armorSlot, armorSlot + 1, true) &&
+						!mergeItemStack(stackInSlot, playerStart, hotbarEnd, true)) {
 					return ItemStack.EMPTY;
 				}
-			} else if (!moveItemStackTo(stackInSlot, playerStart, hotbarEnd, true)) {
+			} else if (!mergeItemStack(stackInSlot, playerStart, hotbarEnd, true)) {
 				return ItemStack.EMPTY;
 			}
 
-			slot.setChanged();
+			slot.onSlotChanged();
 
 			if (stackInSlot.isEmpty()) {
-				slot.set(ItemStack.EMPTY);
+				slot.putStack(ItemStack.EMPTY);
 			} else if (stackInSlot.getCount() == mergeStack.getCount()) {
 				return ItemStack.EMPTY;
 			}
@@ -213,7 +213,7 @@ public class ContainerCADAssembler extends AbstractContainerMenu {
 	}
 
 	@Override
-	public void removed(Player playerIn) {
+	public void onContainerClosed(PlayerEntity playerIn) {
 		assembler.clearCachedCAD();
 	}
 }

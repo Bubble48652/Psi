@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.spellBullet",
-  "category": "psi:items",
+  "category": "items",
   "icon": "minecraft:air",
   "priority": true,
   "pages": [

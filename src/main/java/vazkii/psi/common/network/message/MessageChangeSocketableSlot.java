@@ -8,11 +8,11 @@
  */
 package vazkii.psi.common.network.message;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.Hand;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import vazkii.psi.api.PsiAPI;
 import vazkii.psi.common.core.handler.PlayerDataHandler;
@@ -27,23 +27,23 @@ public class MessageChangeSocketableSlot {
 		this.slot = slot;
 	}
 
-	public MessageChangeSocketableSlot(FriendlyByteBuf buf) {
+	public MessageChangeSocketableSlot(PacketBuffer buf) {
 		this.slot = buf.readVarInt();
 	}
 
-	public void encode(FriendlyByteBuf buf) {
+	public void encode(PacketBuffer buf) {
 		buf.writeVarInt(slot);
 	}
 
 	public boolean receive(Supplier<NetworkEvent.Context> context) {
 		context.get().enqueueWork(() -> {
-			ServerPlayer player = context.get().getSender();
-			ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+			ServerPlayerEntity player = context.get().getSender();
+			ItemStack stack = player.getHeldItem(Hand.MAIN_HAND);
 
 			if (!stack.isEmpty() && stack.getCapability(PsiAPI.SOCKETABLE_CAPABILITY).isPresent()) {
 				stack.getCapability(PsiAPI.SOCKETABLE_CAPABILITY).ifPresent(cap -> cap.setSelectedSlot(slot));
 			} else {
-				stack = player.getItemInHand(InteractionHand.OFF_HAND);
+				stack = player.getHeldItem(Hand.OFF_HAND);
 				if (!stack.isEmpty()) {
 					stack.getCapability(PsiAPI.SOCKETABLE_CAPABILITY).ifPresent(cap -> cap.setSelectedSlot(slot));
 				}

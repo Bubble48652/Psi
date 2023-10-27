@@ -8,11 +8,11 @@
  */
 package vazkii.psi.common.spell.constant;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.nbt.CompoundNBT;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -40,26 +40,26 @@ public class PieceConstantNumber extends SpellPiece {
 	}
 
 	@Override
-	public void drawAdditional(PoseStack ms, MultiBufferSource buffers, int light) {
+	public void drawAdditional(MatrixStack ms, IRenderTypeBuffer buffers, int light) {
 		if (valueStr == null || valueStr.isEmpty() || valueStr.length() > 5) {
 			valueStr = "0";
 		}
 
 		Minecraft mc = Minecraft.getInstance();
 		int color = Psi.magical ? 0 : 0xFFFFFF;
-		float efflen = mc.font.width(valueStr);
+		float efflen = mc.fontRenderer.getStringWidth(valueStr);
 		float scale = 1;
 
 		while (efflen > 16) {
 			scale++;
-			efflen = mc.font.width(valueStr) / scale;
+			efflen = mc.fontRenderer.getStringWidth(valueStr) / scale;
 		}
 
-		ms.pushPose();
+		ms.push();
 		ms.scale(1F / scale, 1F / scale, 1F);
 		ms.translate((9 - efflen / 2) * scale, 4 * scale, 0);
-		mc.font.drawInBatch(valueStr, 0, 0, color, false, ms.last().pose(), buffers, false, 0, light);
-		ms.popPose();
+		mc.fontRenderer.renderString(valueStr, 0, 0, color, false, ms.getLast().getMatrix(), buffers, false, 0, light);
+		ms.pop();
 	}
 
 	@Override
@@ -157,13 +157,13 @@ public class PieceConstantNumber extends SpellPiece {
 	}
 
 	@Override
-	public void writeToNBT(CompoundTag cmp) {
+	public void writeToNBT(CompoundNBT cmp) {
 		super.writeToNBT(cmp);
 		cmp.putString(TAG_CONSTANT_VALUE, valueStr);
 	}
 
 	@Override
-	public void readFromNBT(CompoundTag cmp) {
+	public void readFromNBT(CompoundNBT cmp) {
 		super.readFromNBT(cmp);
 		valueStr = cmp.getString(TAG_CONSTANT_VALUE);
 	}

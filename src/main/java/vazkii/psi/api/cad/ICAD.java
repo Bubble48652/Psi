@@ -8,9 +8,9 @@
  */
 package vazkii.psi.api.cad;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -36,8 +36,8 @@ public interface ICAD {
 			EnumCADComponent componentType = component.getComponentType(componentStack);
 			String name = TAG_COMPONENT_PREFIX + componentType.name();
 
-			CompoundTag cmp = new CompoundTag();
-			componentStack.save(cmp);
+			CompoundNBT cmp = new CompoundNBT();
+			componentStack.write(cmp);
 
 			stack.getOrCreateTag().put(name, cmp);
 		}
@@ -105,6 +105,6 @@ public interface ICAD {
 	 * @param trick  The trick used to craft
 	 * @return Whether crafting was successful
 	 */
-	boolean craft(ItemStack cad, Player entity, PieceCraftingTrick trick);
+	boolean craft(ItemStack cad, PlayerEntity entity, PieceCraftingTrick trick);
 
 }

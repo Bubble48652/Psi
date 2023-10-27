@@ -9,7 +9,7 @@
 package vazkii.psi.client.core.handler;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
@@ -58,7 +58,7 @@ public class ClientTickHandler {
 
 		if (event.phase == TickEvent.Phase.START) {
 
-			boolean pressed = mc.options.keyJump.consumeClick();
+			boolean pressed = mc.gameSettings.keyBindJump.isPressed();
 			if (mc.player != null && pressed && (!lastJumpKeyState && !mc.player.isOnGround())) {
 				PsiArmorEvent.post(new PsiArmorEvent(mc.player, PsiArmorEvent.JUMP));
 				MessageRegister.HANDLER.sendToServer(new MessageTriggerJumpSpell());
@@ -69,12 +69,12 @@ public class ClientTickHandler {
 
 			HUDHandler.tick();
 
-			Screen gui = mc.screen;
-			if (gui == null && KeybindHandler.keybind.isDown()) {
+			Screen gui = mc.currentScreen;
+			if (gui == null && KeybindHandler.keybind.isKeyDown()) {
 				KeybindHandler.keyDown();
 			}
 
-			if (!mc.isPaused()) {
+			if (!mc.isGamePaused()) {
 				++ticksInGame;
 				partialTicks = 0.0F;
 			}

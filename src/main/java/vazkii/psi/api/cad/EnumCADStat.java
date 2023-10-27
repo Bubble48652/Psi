@@ -8,8 +8,6 @@
  */
 package vazkii.psi.api.cad;
 
-import java.util.Locale;
-
 /**
  * An Enum defining all CAD stats and what Components provide them.
  */
@@ -35,7 +33,7 @@ public enum EnumCADStat {
 	}
 
 	public String getName() {
-		return "psi.cadstat." + name().toLowerCase(Locale.ROOT);
+		return "psi.cadstat." + name().toLowerCase();
 	}
 
 }

@@ -8,10 +8,9 @@
  */
 package vazkii.psi.common.item;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.Item.Properties;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.RayTraceResult;
 
 import vazkii.psi.api.PsiAPI;
 import vazkii.psi.api.cad.EnumCADComponent;
@@ -32,13 +31,13 @@ public class ItemCircleSpellBullet extends ItemSpellBullet {
 	public ArrayList<Entity> castSpell(ItemStack stack, SpellContext context) {
 		ItemStack cad = PsiAPI.getPlayerCAD(context.caster);
 		ItemStack colorizer = ((ICAD) cad.getItem()).getComponentInSlot(cad, EnumCADComponent.DYE);
-		HitResult pos = PieceOperatorVectorRaycast.raycast(context.caster, 32);
+		RayTraceResult pos = PieceOperatorVectorRaycast.raycast(context.caster, 32);
 		ArrayList<Entity> spellEntities = new ArrayList<>();
 		if (pos != null) {
-			EntitySpellCircle circle = new EntitySpellCircle(EntitySpellCircle.TYPE, context.caster.getCommandSenderWorld());
+			EntitySpellCircle circle = new EntitySpellCircle(EntitySpellCircle.TYPE, context.caster.getEntityWorld());
 			circle.setInfo(context.caster, colorizer, stack);
-			circle.setPos(pos.getLocation().x, pos.getLocation().y, pos.getLocation().z);
-			circle.getCommandSenderWorld().addFreshEntity(circle);
+			circle.setPosition(pos.getHitVec().x, pos.getHitVec().y, pos.getHitVec().z);
+			circle.getEntityWorld().addEntity(circle);
 			spellEntities.add(circle);
 		}
 		return spellEntities;

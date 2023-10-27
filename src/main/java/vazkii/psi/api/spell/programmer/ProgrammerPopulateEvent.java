@@ -8,8 +8,8 @@
  */
 package vazkii.psi.api.spell.programmer;
 
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraftforge.eventbus.api.Event;
 
 import vazkii.psi.api.spell.SpellPiece;
@@ -20,27 +20,27 @@ import javax.annotation.Nonnull;
 public class ProgrammerPopulateEvent extends Event {
 
 	@Nonnull
-	private final Player entity;
+	private final PlayerEntity entity;
 	@Nonnull
-	private MappedRegistry<Class<? extends SpellPiece>> spellPieceRegistry;
+	private SimpleRegistry<Class<? extends SpellPiece>> spellPieceRegistry;
 
-	public ProgrammerPopulateEvent(Player entity, MappedRegistry<Class<? extends SpellPiece>> registry) {
+	public ProgrammerPopulateEvent(PlayerEntity entity, SimpleRegistry<Class<? extends SpellPiece>> registry) {
 		this.entity = entity;
 		this.spellPieceRegistry = registry;
 	}
 
 	@Nonnull
-	public Player getPlayer() {
+	public PlayerEntity getPlayer() {
 		return entity;
 	}
 
 	@Nonnull
-	public MappedRegistry<Class<? extends SpellPiece>> getSpellPieceRegistry() {
+	public SimpleRegistry<Class<? extends SpellPiece>> getSpellPieceRegistry() {
 		return spellPieceRegistry;
 	}
 
 	@Nonnull
-	public void setSpellPieceRegistry(MappedRegistry<Class<? extends SpellPiece>> registry) {
+	public void setSpellPieceRegistry(SimpleRegistry<Class<? extends SpellPiece>> registry) {
 		spellPieceRegistry = registry;
 	}
 

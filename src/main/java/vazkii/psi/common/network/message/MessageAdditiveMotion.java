@@ -8,10 +8,10 @@
  */
 package vazkii.psi.common.network.message;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.entity.Entity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import vazkii.psi.common.Psi;
 
@@ -32,14 +32,14 @@ public class MessageAdditiveMotion {
 		this.motionZ = motionZ;
 	}
 
-	public MessageAdditiveMotion(FriendlyByteBuf buf) {
+	public MessageAdditiveMotion(PacketBuffer buf) {
 		entityID = buf.readVarInt();
 		motionX = buf.readDouble();
 		motionY = buf.readDouble();
 		motionZ = buf.readDouble();
 	}
 
-	public void encode(FriendlyByteBuf buf) {
+	public void encode(PacketBuffer buf) {
 		buf.writeVarInt(entityID);
 		buf.writeDouble(motionX);
 		buf.writeDouble(motionY);
@@ -48,11 +48,11 @@ public class MessageAdditiveMotion {
 
 	public boolean receive(Supplier<NetworkEvent.Context> context) {
 		context.get().enqueueWork(() -> {
-			Level world = Psi.proxy.getClientWorld();
+			World world = Psi.proxy.getClientWorld();
 			if (world != null) {
-				Entity entity = world.getEntity(entityID);
+				Entity entity = world.getEntityByID(entityID);
 				if (entity != null) {
-					entity.setDeltaMovement(entity.getDeltaMovement().add(motionX, motionY, motionZ));
+					entity.setMotion(entity.getMotion().add(motionX, motionY, motionZ));
 				}
 			}
 		});

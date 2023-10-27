@@ -8,11 +8,11 @@
  */
 package vazkii.psi.client.core.helper;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -23,9 +23,9 @@ public final class TextHelper {
 
 	@OnlyIn(Dist.CLIENT)
 	public static List<String> renderText(int x, int y, int width, String unlocalizedText, boolean centered, boolean doit, Object... format) {
-		PoseStack matrixStack = new PoseStack();
-		Font font = Minecraft.getInstance().font;
-		String text = I18n.get(unlocalizedText, format);
+		MatrixStack matrixStack = new MatrixStack();
+		FontRenderer font = Minecraft.getInstance().fontRenderer;
+		String text = I18n.format(unlocalizedText, format);
 
 		String[] textEntries = text.split("<br>");
 		List<List<String>> lines = new ArrayList<>();
@@ -41,7 +41,7 @@ public final class TextHelper {
 				lineStr += spaced;
 
 				controlCodes = toControlCodes(getControlCodes(prev));
-				if (font.width(lineStr) > width) {
+				if (font.getStringWidth(lineStr) > width) {
 					lines.add(words);
 					lineStr = controlCodes + spaced;
 					words = new ArrayList<>();
@@ -68,12 +68,12 @@ public final class TextHelper {
 			for (String s : words) {
 				int extra = 0;
 
-				int swidth = font.width(s);
+				int swidth = font.getStringWidth(s);
 				if (doit) {
 					if (centered) {
-						font.draw(matrixStack, s, xi + width / 2 - swidth / 2, y, 0xFFFFFF);
+						font.drawString(matrixStack, s, xi + width / 2 - swidth / 2, y, 0xFFFFFF);
 					} else {
-						font.draw(matrixStack, s, xi, y, 0xFFFFFF);
+						font.drawString(matrixStack, s, xi, y, 0xFFFFFF);
 					}
 				}
 				xi += swidth + spacing + extra;

@@ -8,34 +8,34 @@
  */
 package vazkii.psi.common.crafting.recipe;
 
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
-import net.minecraft.world.level.Level;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.SpecialRecipe;
+import net.minecraft.item.crafting.SpecialRecipeSerializer;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 
 import vazkii.psi.api.spell.Spell;
 import vazkii.psi.common.item.ItemSpellDrive;
 
 import javax.annotation.Nonnull;
 
-public class DriveDuplicateRecipe extends CustomRecipe {
-	public static final SimpleRecipeSerializer<DriveDuplicateRecipe> SERIALIZER = new SimpleRecipeSerializer<>(DriveDuplicateRecipe::new);
+public class DriveDuplicateRecipe extends SpecialRecipe {
+	public static final SpecialRecipeSerializer<DriveDuplicateRecipe> SERIALIZER = new SpecialRecipeSerializer<>(DriveDuplicateRecipe::new);
 
 	public DriveDuplicateRecipe(ResourceLocation id) {
 		super(id);
 	}
 
 	@Override
-	public boolean matches(@Nonnull CraftingContainer inv, @Nonnull Level world) {
+	public boolean matches(@Nonnull CraftingInventory inv, @Nonnull World world) {
 		boolean foundSource = false;
 		boolean foundTarget = false;
 
-		for (int i = 0; i < inv.getContainerSize(); i++) {
-			ItemStack stack = inv.getItem(i);
+		for (int i = 0; i < inv.getSizeInventory(); i++) {
+			ItemStack stack = inv.getStackInSlot(i);
 			if (!stack.isEmpty()) {
 				if (stack.getItem() instanceof ItemSpellDrive) {
 					if (ItemSpellDrive.getSpell(stack) == null) {
@@ -60,12 +60,12 @@ public class DriveDuplicateRecipe extends CustomRecipe {
 
 	@Nonnull
 	@Override
-	public ItemStack assemble(@Nonnull CraftingContainer inv) {
+	public ItemStack getCraftingResult(@Nonnull CraftingInventory inv) {
 		Spell source = null;
 		ItemStack target = ItemStack.EMPTY;
 
-		for (int i = 0; i < inv.getContainerSize(); i++) {
-			ItemStack stack = inv.getItem(i);
+		for (int i = 0; i < inv.getSizeInventory(); i++) {
+			ItemStack stack = inv.getStackInSlot(i);
 			if (!stack.isEmpty()) {
 				Spell spell = ItemSpellDrive.getSpell(stack);
 				if (spell != null) {
@@ -82,11 +82,11 @@ public class DriveDuplicateRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
-		NonNullList<ItemStack> list = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
+	public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
+		NonNullList<ItemStack> list = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 
 		for (int i = 0; i < list.size(); ++i) {
-			ItemStack item = inv.getItem(i);
+			ItemStack item = inv.getStackInSlot(i);
 			if (!item.isEmpty() && ItemSpellDrive.getSpell(item) != null) {
 				list.set(i, item.copy());
 				break;
@@ -98,17 +98,17 @@ public class DriveDuplicateRecipe extends CustomRecipe {
 
 	@Nonnull
 	@Override
-	public RecipeSerializer<?> getSerializer() {
+	public IRecipeSerializer<?> getSerializer() {
 		return SERIALIZER;
 	}
 
 	@Override
-	public boolean canCraftInDimensions(int width, int height) {
+	public boolean canFit(int width, int height) {
 		return true;
 	}
 
 	@Override
-	public boolean isSpecial() {
+	public boolean isDynamic() {
 		return true;
 	}
 }

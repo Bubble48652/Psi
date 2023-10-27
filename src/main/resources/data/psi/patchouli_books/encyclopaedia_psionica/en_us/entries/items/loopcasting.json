@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.loopcasting",
-  "category": "psi:items",
+  "category": "items",
   "icon": "psi:textures/spell/selector_loopcast_index.png",
   "pages": [
     {

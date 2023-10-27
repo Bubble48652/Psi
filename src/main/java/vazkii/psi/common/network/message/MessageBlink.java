@@ -8,9 +8,9 @@
  */
 package vazkii.psi.common.network.message;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.Entity;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.entity.Entity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import vazkii.psi.common.Psi;
 
@@ -30,13 +30,13 @@ public class MessageBlink {
 		this.offZ = offZ;
 	}
 
-	public MessageBlink(FriendlyByteBuf buf) {
+	public MessageBlink(PacketBuffer buf) {
 		this.offX = buf.readDouble();
 		this.offY = buf.readDouble();
 		this.offZ = buf.readDouble();
 	}
 
-	public void encode(FriendlyByteBuf buf) {
+	public void encode(PacketBuffer buf) {
 		buf.writeDouble(offX);
 		buf.writeDouble(offY);
 		buf.writeDouble(offZ);
@@ -46,7 +46,7 @@ public class MessageBlink {
 		context.get().enqueueWork(() -> {
 			Entity entity = Psi.proxy.getClientPlayer();
 			if (entity != null) {
-				entity.setPos(entity.getX() + offX, entity.getY() + offY, entity.getZ() + offZ);
+				entity.setPosition(entity.getPosX() + offX, entity.getPosY() + offY, entity.getPosZ() + offZ);
 			}
 		});
 		return true;

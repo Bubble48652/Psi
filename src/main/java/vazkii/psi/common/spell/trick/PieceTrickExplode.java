@@ -8,9 +8,9 @@
  */
 package vazkii.psi.common.spell.trick;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Explosion;
 
 import vazkii.psi.api.internal.Vector3;
 import vazkii.psi.api.spell.EnumSpellStat;
@@ -71,9 +71,9 @@ public class PieceTrickExplode extends PieceTrick {
 		}
 
 		BlockPos pos = positionVal.toBlockPos();
-		BlockState state = context.focalPoint.getCommandSenderWorld().getBlockState(pos);
+		BlockState state = context.focalPoint.getEntityWorld().getBlockState(pos);
 
-		context.focalPoint.getCommandSenderWorld().explode(context.focalPoint, positionVal.x, positionVal.y, positionVal.z, (float) powerVal, state.getMaterial().isLiquid() ? Explosion.BlockInteraction.NONE : Explosion.BlockInteraction.BREAK);
+		context.focalPoint.getEntityWorld().createExplosion(context.focalPoint, positionVal.x, positionVal.y, positionVal.z, (float) powerVal, state.getMaterial().isLiquid() ? Explosion.Mode.NONE : Explosion.Mode.BREAK);
 		return null;
 	}
 

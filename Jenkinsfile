@@ -6,7 +6,7 @@ pipeline {
     }
     agent any
     tools {
-        jdk "jdk-17.0.1"
+        jdk "jdk8u292-b10"
     }
     stages {
         stage('Clean') {
@@ -19,7 +19,7 @@ pipeline {
         stage('Build and Deploy') {
             steps {
                 echo 'Building and Deploying to Maven'
-					sh './gradlew build publish'
+					sh './gradlew build uploadArchives'
                 }
             }
         }

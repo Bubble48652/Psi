@@ -8,8 +8,8 @@
  */
 package vazkii.psi.api.cad;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -31,9 +31,9 @@ public class AssembleCADEvent extends Event {
 
 	private ItemStack cad;
 	private final ITileCADAssembler assembler;
-	private final Player player;
+	private final PlayerEntity player;
 
-	public AssembleCADEvent(ItemStack cad, ITileCADAssembler assembler, Player player) {
+	public AssembleCADEvent(ItemStack cad, ITileCADAssembler assembler, PlayerEntity player) {
 		this.cad = cad;
 		this.assembler = assembler;
 		this.player = player;
@@ -54,7 +54,7 @@ public class AssembleCADEvent extends Event {
 		this.cad = cad;
 	}
 
-	public Player getPlayer() {
+	public PlayerEntity getPlayer() {
 		return player;
 	}
 }

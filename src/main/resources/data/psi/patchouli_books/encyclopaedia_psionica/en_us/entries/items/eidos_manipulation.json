@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.eidosManipulation",
-  "category": "psi:items",
+  "category": "items",
   "icon": "psi:textures/spell/trick_eidos_reversal.png",
   "pages": [
     {

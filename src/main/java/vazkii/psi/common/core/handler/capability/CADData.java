@@ -10,15 +10,15 @@ package vazkii.psi.common.core.handler.capability;
 
 import com.google.common.collect.Lists;
 
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.DoubleTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.DoubleNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 
 import vazkii.psi.api.PsiAPI;
@@ -115,13 +115,13 @@ public class CADData implements ICapabilityProvider, ICADData, ISpellAcceptor, I
 	}
 
 	@Override
-	public void setSpell(Player player, Spell spell) {
+	public void setSpell(PlayerEntity player, Spell spell) {
 		int slot = getSelectedSlot();
 		ItemStack bullet = getBulletInSocket(slot);
 		if (!bullet.isEmpty() && ISpellAcceptor.isAcceptor(bullet)) {
 			ISpellAcceptor.acceptor(bullet).setSpell(player, spell);
 			setBulletInSocket(slot, bullet);
-			player.getCooldowns().addCooldown(cad.getItem(), 10);
+			player.getCooldownTracker().setCooldown(cad.getItem(), 10);
 		}
 	}
 
@@ -142,22 +142,22 @@ public class CADData implements ICapabilityProvider, ICADData, ISpellAcceptor, I
 	@Override
 	public ItemStack getBulletInSocket(int slot) {
 		String name = IPsimetalTool.TAG_BULLET_PREFIX + slot;
-		CompoundTag cmp = cad.getOrCreateTag().getCompound(name);
+		CompoundNBT cmp = cad.getOrCreateTag().getCompound(name);
 
 		if (cmp.isEmpty()) {
 			return ItemStack.EMPTY;
 		}
 
-		return ItemStack.of(cmp);
+		return ItemStack.read(cmp);
 	}
 
 	@Override
 	public void setBulletInSocket(int slot, ItemStack bullet) {
 		String name = IPsimetalTool.TAG_BULLET_PREFIX + slot;
-		CompoundTag cmp = new CompoundTag();
+		CompoundNBT cmp = new CompoundNBT();
 
 		if (!bullet.isEmpty()) {
-			bullet.save(cmp);
+			bullet.write(cmp);
 		}
 
 		cad.getOrCreateTag().put(name, cmp);
@@ -183,8 +183,8 @@ public class CADData implements ICapabilityProvider, ICADData, ISpellAcceptor, I
 	}
 
 	@Override
-	public CompoundTag serializeForSynchronization() {
-		CompoundTag compound = new CompoundTag();
+	public CompoundNBT serializeForSynchronization() {
+		CompoundNBT compound = new CompoundNBT();
 		compound.putInt("Time", time);
 		compound.putInt("Battery", battery);
 
@@ -192,18 +192,18 @@ public class CADData implements ICapabilityProvider, ICADData, ISpellAcceptor, I
 	}
 
 	@Override
-	public CompoundTag serializeNBT() {
-		CompoundTag compound = serializeForSynchronization();
+	public CompoundNBT serializeNBT() {
+		CompoundNBT compound = serializeForSynchronization();
 
-		ListTag memory = new ListTag();
+		ListNBT memory = new ListNBT();
 		for (Vector3 vector : vectors) {
 			if (vector == null) {
-				memory.add(new ListTag());
+				memory.add(new ListNBT());
 			} else {
-				ListTag vec = new ListTag();
-				vec.add(DoubleTag.valueOf(vector.x));
-				vec.add(DoubleTag.valueOf(vector.y));
-				vec.add(DoubleTag.valueOf(vector.z));
+				ListNBT vec = new ListNBT();
+				vec.add(DoubleNBT.valueOf(vector.x));
+				vec.add(DoubleNBT.valueOf(vector.y));
+				vec.add(DoubleNBT.valueOf(vector.z));
 				memory.add(vec);
 			}
 		}
@@ -213,20 +213,20 @@ public class CADData implements ICapabilityProvider, ICADData, ISpellAcceptor, I
 	}
 
 	@Override
-	public void deserializeNBT(CompoundTag nbt) {
-		if (nbt.contains("Time", Tag.TAG_ANY_NUMERIC)) {
+	public void deserializeNBT(CompoundNBT nbt) {
+		if (nbt.contains("Time", Constants.NBT.TAG_ANY_NUMERIC)) {
 			time = nbt.getInt("Time");
 		}
-		if (nbt.contains("Battery", Tag.TAG_ANY_NUMERIC)) {
+		if (nbt.contains("Battery", Constants.NBT.TAG_ANY_NUMERIC)) {
 			battery = nbt.getInt("Battery");
 		}
 
-		if (nbt.contains("Memory", Tag.TAG_LIST)) {
-			ListTag memory = nbt.getList("Memory", Tag.TAG_LIST);
+		if (nbt.contains("Memory", Constants.NBT.TAG_LIST)) {
+			ListNBT memory = nbt.getList("Memory", Constants.NBT.TAG_LIST);
 			List<Vector3> newVectors = Lists.newArrayList();
 			for (int i = 0; i < memory.size(); i++) {
-				ListTag vec = (ListTag) memory.get(i);
-				if (vec.getElementType() == Tag.TAG_DOUBLE && vec.size() >= 3) {
+				ListNBT vec = (ListNBT) memory.get(i);
+				if (vec.getTagType() == Constants.NBT.TAG_DOUBLE && vec.size() >= 3) {
 					newVectors.add(new Vector3(vec.getDouble(0), vec.getDouble(1), vec.getDouble(2)));
 				} else {
 					newVectors.add(null);

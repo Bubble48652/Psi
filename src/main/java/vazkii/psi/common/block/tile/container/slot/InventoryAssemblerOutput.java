@@ -8,9 +8,9 @@
  */
 package vazkii.psi.common.block.tile.container.slot;
 
-import net.minecraft.world.Container;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 
 import vazkii.psi.common.block.tile.TileCADAssembler;
 
@@ -20,12 +20,12 @@ import javax.annotation.Nonnull;
  * @author WireSegal
  *         Created at 4:44 PM on 1/2/19.
  */
-public class InventoryAssemblerOutput implements Container {
+public class InventoryAssemblerOutput implements IInventory {
 
-	private final Player player;
+	private final PlayerEntity player;
 	private final TileCADAssembler assembler;
 
-	public InventoryAssemblerOutput(Player player, TileCADAssembler assembler) {
+	public InventoryAssemblerOutput(PlayerEntity player, TileCADAssembler assembler) {
 		this.player = player;
 		this.assembler = assembler;
 	}
@@ -35,7 +35,7 @@ public class InventoryAssemblerOutput implements Container {
 	}
 
 	@Override
-	public int getContainerSize() {
+	public int getSizeInventory() {
 		return 1;
 	}
 
@@ -46,59 +46,59 @@ public class InventoryAssemblerOutput implements Container {
 
 	@Nonnull
 	@Override
-	public ItemStack getItem(int index) {
+	public ItemStack getStackInSlot(int index) {
 		return getStack();
 	}
 
 	@Nonnull
 	@Override
-	public ItemStack removeItem(int index, int count) {
+	public ItemStack decrStackSize(int index, int count) {
 		return getStack();
 	}
 
 	@Nonnull
 	@Override
-	public ItemStack removeItemNoUpdate(int index) {
+	public ItemStack removeStackFromSlot(int index) {
 		return getStack();
 	}
 
 	@Override
-	public void setItem(int index, @Nonnull ItemStack stack) {
+	public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
 		// NO-OP
 	}
 
 	@Override
-	public int getMaxStackSize() {
+	public int getInventoryStackLimit() {
 		return 1;
 	}
 
 	@Override
-	public void setChanged() {
+	public void markDirty() {
 		// NO-OP
 	}
 
 	@Override
-	public boolean stillValid(@Nonnull Player player) {
+	public boolean isUsableByPlayer(@Nonnull PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void startOpen(@Nonnull Player player) {
+	public void openInventory(@Nonnull PlayerEntity player) {
 		// NO-OP
 	}
 
 	@Override
-	public void stopOpen(@Nonnull Player player) {
+	public void closeInventory(@Nonnull PlayerEntity player) {
 		// NO-OP
 	}
 
 	@Override
-	public boolean canPlaceItem(int index, @Nonnull ItemStack stack) {
+	public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
 		return false;
 	}
 
 	@Override
-	public void clearContent() {
+	public void clear() {
 		// NO-OP
 	}
 }

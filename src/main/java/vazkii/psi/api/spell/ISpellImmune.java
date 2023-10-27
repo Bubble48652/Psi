@@ -8,7 +8,7 @@
  */
 package vazkii.psi.api.spell;
 
-import net.minecraft.world.entity.Entity;
+import net.minecraft.entity.Entity;
 
 import vazkii.psi.api.PsiAPI;
 
@@ -24,7 +24,7 @@ public interface ISpellImmune {
 	boolean isImmune();
 
 	static boolean isImmune(Entity e) {
-		return !e.canChangeDimensions() || e.getCapability(PsiAPI.SPELL_IMMUNE_CAPABILITY).map(ISpellImmune::isImmune).orElse(false);
+		return !e.isNonBoss() || e.getCapability(PsiAPI.SPELL_IMMUNE_CAPABILITY).map(ISpellImmune::isImmune).orElse(false);
 	}
 
 }

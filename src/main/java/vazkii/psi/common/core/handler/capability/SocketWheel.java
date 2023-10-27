@@ -8,8 +8,8 @@
  */
 package vazkii.psi.common.core.handler.capability;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -18,7 +18,7 @@ import vazkii.psi.api.cad.ISocketable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SocketWheel implements ISocketable, INBTSerializable<CompoundTag> {
+public class SocketWheel implements ISocketable, INBTSerializable<CompoundNBT> {
 
 	private final int size;
 
@@ -87,14 +87,14 @@ public class SocketWheel implements ISocketable, INBTSerializable<CompoundTag> {
 	}
 
 	@Override
-	public CompoundTag serializeNBT() {
-		CompoundTag compound = handler.serializeNBT();
+	public CompoundNBT serializeNBT() {
+		CompoundNBT compound = handler.serializeNBT();
 		compound.remove("Size");
 		return compound;
 	}
 
 	@Override
-	public void deserializeNBT(CompoundTag nbt) {
+	public void deserializeNBT(CompoundNBT nbt) {
 		nbt.putInt("Size", size);
 		handler.deserializeNBT(nbt);
 	}

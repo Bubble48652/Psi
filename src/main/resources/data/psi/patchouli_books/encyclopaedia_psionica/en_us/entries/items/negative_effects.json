@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.negativeEffects",
-  "category": "psi:items",
+  "category": "items",
   "icon": "psi:textures/spell/trick_wither.png",
   "pages": [
     {

@@ -10,11 +10,11 @@ package vazkii.psi.client.core.helper;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.blaze3d.platform.NativeImage;
 
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Screenshot;
+import net.minecraft.client.renderer.texture.NativeImage;
+import net.minecraft.util.ScreenShotHelper;
+import net.minecraft.util.Util;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -57,7 +57,7 @@ public final class SharingHelper {
 			String encodedTitle = URLEncoder.encode(title, "UTF-8");
 
 			String redditUrl = "https://old.reddit.com/r/psispellcompendium/submit?title=" + encodedTitle + "&text=" + encodedContents;
-			Util.getPlatform().openUri(new URI(redditUrl));
+			Util.getOSType().openURI(new URI(redditUrl));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -66,7 +66,7 @@ public final class SharingHelper {
 	public static void uploadAndOpen(String title, String export) {
 		String url = uploadImage(title, export);
 		try {
-			Util.getPlatform().openUri(new URI(url));
+			Util.getOSType().openURI(new URI(url));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -107,8 +107,11 @@ public final class SharingHelper {
 	public static String takeScreenshot() throws Exception {
 		Minecraft mc = Minecraft.getInstance();
 
-		NativeImage image = Screenshot.takeScreenshot(mc.getMainRenderTarget());
-		byte[] bArray = image.asByteArray();
+		int screenWidth = mc.getMainWindow().getWidth();
+		int screenHeight = mc.getMainWindow().getHeight();
+
+		NativeImage image = ScreenShotHelper.createScreenshot(screenWidth, screenHeight, mc.getFramebuffer());
+		byte[] bArray = image.getBytes();
 		return Base64.getEncoder().encodeToString(bArray);
 	}
 

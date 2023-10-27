@@ -10,13 +10,13 @@ package vazkii.psi.api.inventory;
 
 import com.google.common.collect.Iterators;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.Container;
-import net.minecraft.world.Nameable;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIntArray;
+import net.minecraft.util.INameable;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import vazkii.psi.api.cad.ISocketable;
 
@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Iterator;
 
-public class InventorySocketable implements Container, Nameable, ContainerData {
+public class InventorySocketable implements IInventory, INameable, IIntArray {
 
 	@Nullable
 	private ISocketable socketable;
@@ -55,7 +55,7 @@ public class InventorySocketable implements Container, Nameable, ContainerData {
 	}
 
 	@Override
-	public int getContainerSize() {
+	public int getSizeInventory() {
 		Iterator<ItemStack> sockerator = getSockerator();
 		return Iterators.size(sockerator);
 	}
@@ -73,7 +73,7 @@ public class InventorySocketable implements Container, Nameable, ContainerData {
 
 	@Nonnull
 	@Override
-	public ItemStack getItem(int index) {
+	public ItemStack getStackInSlot(int index) {
 		if (socketable == null) {
 			return ItemStack.EMPTY;
 		}
@@ -82,7 +82,7 @@ public class InventorySocketable implements Container, Nameable, ContainerData {
 
 	@Nonnull
 	@Override
-	public ItemStack removeItem(int index, int count) {
+	public ItemStack decrStackSize(int index, int count) {
 		if (socketable == null) {
 			return ItemStack.EMPTY;
 		}
@@ -96,12 +96,12 @@ public class InventorySocketable implements Container, Nameable, ContainerData {
 
 	@Nonnull
 	@Override
-	public ItemStack removeItemNoUpdate(int index) {
-		return removeItem(index, 1);
+	public ItemStack removeStackFromSlot(int index) {
+		return decrStackSize(index, 1);
 	}
 
 	@Override
-	public void setItem(int index, @Nonnull ItemStack bullet) {
+	public void setInventorySlotContents(int index, @Nonnull ItemStack bullet) {
 		if (socketable == null) {
 			return;
 		}
@@ -110,32 +110,32 @@ public class InventorySocketable implements Container, Nameable, ContainerData {
 	}
 
 	@Override
-	public int getMaxStackSize() {
+	public int getInventoryStackLimit() {
 		return 1;
 	}
 
 	@Override
-	public void setChanged() {
+	public void markDirty() {
 		// NO-OP
 	}
 
 	@Override
-	public boolean stillValid(@Nonnull Player player) {
+	public boolean isUsableByPlayer(@Nonnull PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void startOpen(@Nonnull Player player) {
+	public void openInventory(@Nonnull PlayerEntity player) {
 		// NO-OP
 	}
 
 	@Override
-	public void stopOpen(@Nonnull Player player) {
+	public void closeInventory(@Nonnull PlayerEntity player) {
 		// NO-OP
 	}
 
 	@Override
-	public boolean canPlaceItem(int index, @Nonnull ItemStack stack) {
+	public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
 		return socketable != null && socketable.isItemValid(index, stack);
 	}
 
@@ -150,12 +150,12 @@ public class InventorySocketable implements Container, Nameable, ContainerData {
 	}
 
 	@Override
-	public int getCount() {
+	public int size() {
 		return 0;
 	}
 
 	@Override
-	public void clearContent() {
+	public void clear() {
 		Iterator<ItemStack> sockerator = getSockerator();
 		while (sockerator.hasNext()) {
 			sockerator.next();
@@ -165,8 +165,8 @@ public class InventorySocketable implements Container, Nameable, ContainerData {
 
 	@Nonnull
 	@Override
-	public Component getName() {
-		return new TranslatableComponent("psi.container.socketable");
+	public ITextComponent getName() {
+		return new TranslationTextComponent("psi.container.socketable");
 	}
 
 }

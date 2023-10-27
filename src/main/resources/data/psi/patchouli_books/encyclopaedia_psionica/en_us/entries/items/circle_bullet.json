@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.circleBullet",
-  "category": "psi:items",
+  "category": "items",
   "icon": "psi:spell_bullet_circle",
   "pages": [
     {

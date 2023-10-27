@@ -34,7 +34,7 @@ public class PieceSelectorBlockSideBroken extends PieceSelector {
 		if (context.positionBroken.isInside()) {
 			throw new SpellRuntimeException(SpellRuntimeException.NULL_VECTOR);
 		}
-		return Vector3.fromDirection(context.positionBroken.getDirection());
+		return Vector3.fromDirection(context.positionBroken.getFace());
 	}
 
 }

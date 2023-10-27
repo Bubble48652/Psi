@@ -8,7 +8,7 @@
  */
 package vazkii.psi.api.spell.param;
 
-import net.minecraft.world.entity.Entity;
+import net.minecraft.entity.Entity;
 
 public class ParamEntity extends ParamSpecific<Entity> {
 

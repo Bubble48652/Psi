@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.exosuit",
-  "category": "psi:items",
+  "category": "items",
   "icon": "psi:exosuit_controller",
   "pages": [
     {

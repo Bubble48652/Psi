@@ -8,8 +8,8 @@
  */
 package vazkii.psi.common.spell.operator.entity;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 
 import vazkii.psi.api.internal.Vector3;
 import vazkii.psi.api.spell.Spell;
@@ -41,7 +41,7 @@ public class PieceOperatorEntityPosition extends PieceOperator {
 		}
 
 		Vector3 vec = Vector3.fromEntity(e);
-		if (e instanceof Player) {
+		if (e instanceof PlayerEntity) {
 			vec.add(0, e.getEyeHeight(), 0);
 		}
 

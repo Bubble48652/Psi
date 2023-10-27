@@ -8,7 +8,7 @@
  */
 package vazkii.psi.common.spell.base;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ResourceLocation;
 
 import vazkii.psi.api.PsiAPI;
 import vazkii.psi.api.spell.Spell;

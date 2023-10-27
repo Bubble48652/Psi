@@ -1,6 +1,6 @@
 {
   "name": "psi.book.entry.loopcastBullet",
-  "category": "psi:items",
+  "category": "items",
   "icon": "psi:spell_bullet_loop",
   "pages": [
     {
